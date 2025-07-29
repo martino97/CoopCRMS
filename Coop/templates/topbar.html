@@ -1,0 +1,34 @@
+{% load static %}
+<div class="wrap">
+    <div class="header-left">
+        <a href="/">
+            <img class="" id="logo_header_mobile" alt="" src="{% static 'images/logo/logo.png' %}" data-light="{% static 'images/logo/logo.png' %}" data-dark="{% static 'images/logo/logo-dark.png' %}" data-width="154px" data-height="52px" data-retina="{% static 'images/logo/logo@2x.png' %}">
+        </a>
+        <div class="button-show-hide">
+            <i class="icon-menu-left"></i>
+        </div>
+        <form class="form-search flex-grow">
+            <fieldset class="name">
+                <input type="text" placeholder="Search here..." class="show-search" name="name" tabindex="2" value="" aria-required="true" required="">
+            </fieldset>
+            <div class="button-submit">
+                <button class="" type="submit"><i class="icon-search"></i></button>
+            </div>
+            <div class="box-content-search" id="box-content-search">
+                <!-- ...search dropdown content omitted for brevity... -->
+            </div>
+        </form>
+    </div>
+    <div class="header-grid">
+        <div class="header-item country">
+            <select class="image-select no-text">
+                <option data-thumbnail="{% static 'images/country/1.png' %}">ENG</option>
+                <option data-thumbnail="{% static 'images/country/9.png' %}">VIE</option>
+            </select>
+        </div>
+        <div class="header-item button-dark-light">
+            <i class="icon-moon"></i>
+        </div>
+        <!-- ...other header items (notifications, messages, apps, user dropdown) can be added here for full fidelity... -->
+    </div>
+</div>

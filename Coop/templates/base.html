@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="utf-8">
+    <title>CoopBank</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+    <!-- ...other head content... -->
+</head>
+<body class="body">
+    <div id="wrapper">
+        <div id="page" class="">
+            {% block content %}{% endblock %}
+        </div>
+        <footer>
+            <div class="text-tiny" style="text-align:center; margin-top:32px;">Copyright © 2025 CoopBank,  Designed by Martin Malopa All rights reserved.</div>
+        </footer>
+    </div>
+    <script src="{% static 'js/jquery.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap-select.min.js' %}"></script>
+    <script src="{% static 'js/main.js' %}"></script>
+</body>
+</html>

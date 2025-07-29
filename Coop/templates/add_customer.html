@@ -1,0 +1,671 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Add New Customer</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/animate.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/animation.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap-select.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'font/fonts.css' %}">
+    <link rel="stylesheet" href="{% static 'icon/style.css' %}">
+    <link rel="shortcut icon" href="{% static 'images/favicon.png' %}">
+    <link rel="apple-touch-icon-precomposed" href="{% static 'images/favicon.png' %}">
+    <style>
+        /* Custom form styling */
+        .atm-form-card {
+            background: #f8fafc;
+            border-radius: 12px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+            padding: 40px 32px 32px 32px;
+            margin: 40px auto;
+            max-width: 600px;
+        }
+        .atm-form-card h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1a237e;
+            margin-bottom: 24px;
+            text-align: center;
+        }
+        .atm-form-group {
+            margin-bottom: 22px;
+        }
+        .atm-form-group label {
+            font-weight: 600;
+            color: #222;
+            margin-bottom: 6px;
+            display: block;
+        }
+        .atm-form-group input,
+        .atm-form-group select,
+        .atm-form-group textarea {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1.5px solid #cfd8dc;
+            border-radius: 6px;
+            background: #fff;
+            font-size: 1rem;
+            transition: border 0.2s;
+        }
+        .atm-form-group input:focus,
+        .atm-form-group select:focus,
+        .atm-form-group textarea:focus {
+            border-color: #1976d2;
+            outline: none;
+        }
+        .atm-form-group .helptext {
+            font-size: 0.92em;
+            color: #607d8b;
+            margin-top: 2px;
+        }
+        .atm-form-errors {
+            background: #ffebee;
+            color: #c62828;
+            border-radius: 6px;
+            padding: 10px 16px;
+            margin-bottom: 18px;
+            font-size: 1rem;
+        }
+        .tf-button.w-full {
+            width: 100%;
+            font-size: 1.1rem;
+            padding: 12px 0;
+            border-radius: 6px;
+            background: linear-gradient(90deg, #1976d2 0%, #42a5f5 100%);
+            color: #fff;
+            font-weight: 600;
+            border: none;
+            transition: background 0.2s;
+        }
+        .tf-button.w-full:hover {
+            background: linear-gradient(90deg, #1565c0 0%, #1e88e5 100%);
+        }
+        .signature-pad-section, .camera-capture-section {
+            background: #fff;
+            border-radius: 8px;
+            padding: 18px 18px 12px 18px;
+            margin-bottom: 18px;
+            box-shadow: 0 2px 8px rgba(33,150,243,0.07);
+        }
+        .signature-pad-section h4, .camera-capture-section h4 {
+            font-size: 1.1rem;
+            color: #1976d2;
+            margin-bottom: 12px;
+        }
+        .atm-form-card .back-link {
+            display: inline-block;
+            margin-top: 18px;
+            color: #1976d2;
+            font-weight: 500;
+            text-decoration: none;
+        }
+        .atm-form-card .back-link:hover {
+            text-decoration: underline;
+        }
+        /* Responsive */
+        @media (max-width: 700px) {
+            .atm-form-card {
+                padding: 18px 6vw 18px 6vw;
+            }
+        }
+    </style>
+</head>
+<body class="body">
+    <div id="wrapper">
+        <div id="page" class="">
+            <div class="layout-wrap">
+                <!-- Sidebar (from home-2.html) -->
+                <div class="section-menu-left">
+                    <div class="box-logo">
+                        <a href="{% url 'dashboard' %}" id="site-logo-inner">
+                            <img id="logo_header" alt="CoopLogo"
+                                 src="{% static 'images/CoopLogo.png' %}"
+                                 data-light="{% static 'images/CoopLogo.png' %}"
+                                 data-dark="{% static 'images/CoopLogo.png' %}"
+                                 style="max-width:180px; height:auto; display:block; margin:0 auto 16px;">
+                        </a>
+                        <div class="button-show-hide">
+                            <i class="icon-menu-left"></i>
+                        </div>
+                    </div>
+                    <div class="section-menu-left-wrap">
+                        <div class="center">
+                            <div class="center-item">
+                                <div class="center-heading">Main Home</div>
+                                <ul class="menu-list">
+                                    <li class="menu-item has-children">
+                                        <a href="{% url 'dashboard' %}" class="menu-item-button">
+                                            <div class="icon"><i class="icon-grid"></i></div>
+                                            <div class="text">Dashboard</div>
+                                        </a>
+                                        <ul class="sub-menu">
+                                            <li class="sub-menu-item">
+                                                <a href="{% url 'dashboard' %}">
+                                                    <div class="text">Home 01</div>
+                                                </a>
+                                            </li>
+                                            <li class="sub-menu-item">
+                                                <a href="#" class="active">
+                                                    <div class="text">Home 02</div>
+                                                </a>
+                                            </li>
+                                            <li class="sub-menu-item">
+                                                <a href="#">
+                                                    <div class="text">Home 03</div>
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <!-- ...other sidebar sections from home-2.html... -->
+                              <div class="center-item">
+                                <div class="center-heading">All page</div>
+                                <ul class="menu-list">
+                                    <li class="menu-item has-children">
+                                        <a href="javascript:void(0);" class="menu-item-button">
+                                            <div class="icon"><i class="icon-shopping-cart"></i></div>
+                                            <div class="text">Ecommerce</div>
+                                        </a>
+                                        <ul class="sub-menu">
+                                            <li class="sub-menu-item">
+                                                <a href="add-product.html" class="">
+                                                    <div class="text">Add Product</div>
+                                                </a>
+                                            </li>
+                                            <li class="sub-menu-item">
+                                                <a href="product-list.html" class="">
+                                                    <div class="text">Product List</div>
+                                                </a>
+                                            </li>
+                                            <li class="sub-menu-item">
+                                                <a href="product-detail-1.html" class="">
+                                                    <div class="text">Product Detail 1</div>
+                                                </a>
+                                            </li>
+                                            <li class="sub-menu-item">
+                                                <a href="product-detail-2.html" class="">
+                                                    <div class="text">Product Detail 2</div>
+                                                </a>
+                                            </li>
+                                            <li class="sub-menu-item">
+                                                <a href="product-detail-3.html" class="">
+                                                    <div class="text">Product Detail 3</div>
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li class="menu-item has-children">
+                                        <a href="javascript:void(0);" class="menu-item-button">
+                                            <div class="icon"><i class="icon-layers"></i></div>
+                                            <div class="text">Category</div>
+                                        </a>
+                                        <ul class="sub-menu">
+                                            <li class="sub-menu-item">
+                                                <a href="category-list.html" class="">
+                                                    <div class="text">Category list</div>
+                                                </a>
+                                            </li>
+                                            <li class="sub-menu-item">
+                                                <a href="new-category.html" class="">
+                                                    <div class="text">New category</div>
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li class="menu-item has-children">
+                                        <a href="javascript:void(0);" class="menu-item-button">
+                                            <div class="icon"><i class="icon-box"></i></div>
+                                            <div class="text">Attributes</div>
+                                        </a>
+                                        <ul class="sub-menu">
+                                            <li class="sub-menu-item">
+                                                <a href="attributes.html" class="">
+                                                    <div class="text">Attributes</div>
+                                                </a>
+                                            </li>
+                                            <li class="sub-menu-item">
+                                                <a href="add-attributes.html" class="">
+                                                    <div class="text">Add attributes</div>
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    </ul>
+                                    </div>
+                        </div>
+                        <div class="bot text-center">
+                            <div class="wrap">
+                                <div class="mb-20">
+                                    <img src="{% static 'images/menu-left/img-bot.png' %}" alt="">
+                                </div>
+                                <div class="mb-20">
+                                    <h6>Hi, how can we help?</h6>
+                                    <div class="text">Contact us if you have any assistance, we will contact you as soon as possible</div>
+                                </div>
+                                <a href="info@cbtbank.co.tzclass="tf-button w-full">Contact Us</a>
+                                 <div class="center-item">
+                                <ul class="wg-social">
+                                    <li>
+                                        <a href="https://www.facebook.com/coopbanktanzania/"><i class="icon-facebook"></i></a>
+                                    </li>
+                                    <li class="active">
+                                        <a href="https://twitter.com/coopbank"><i class="icon-twitter"></i></a>
+                                    </li>
+                                    <li>
+                                        <a href="https://www.linkedin.com/company/coop-bank-tanzania/posts/?feedView=all"><i class="icon-linkedin"></i></a>
+                                    </li>
+                                    <li>
+                                        <a href="https://www.instagram.com/coopbanktanzania/"><i class="icon-instagram"></i></a>
+                                    </li>
+                                </ul>
+                            </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- /Sidebar -->
+
+                <div class="section-content-right">
+                    <!-- Topbar (from home-2.html) -->
+                    <div class="header-dashboard">
+                        <div class="wrap">
+                            <div class="header-left">
+                                <a href="{% url 'dashboard' %}">
+                                    <img class="" id="logo_header_mobile" alt="" src="{% static 'images/CoopLogo.png' %}" data-light="{% static 'images/CoopLogo.png' %}" data-dark="{% static 'images/CoopLogo.png' %}">
+                                </a>
+                                <div class="button-show-hide">
+                                    <i class="icon-menu-left"></i>
+                                </div>
+                                <form class="form-search flex-grow">
+                                    <fieldset class="name">
+                                        <input type="text" placeholder="Search here..." class="show-search" name="name" tabindex="2" value="" aria-required="true" required="">
+                                    </fieldset>
+                                    <div class="button-submit">
+                                        <button class="" type="submit"><i class="icon-search"></i></button>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="header-grid">
+                                <div class="header-item country">
+                                    <select class="image-select no-text">
+                                        <option data-thumbnail="{% static 'images/country/1.png' %}">ENG</option>
+                                        <option data-thumbnail="{% static 'images/country/9.png' %}">VIE</option>
+                                    </select>
+                                </div>
+                                <div class="header-item button-dark-light">
+                                    <i class="icon-moon"></i>
+                                </div>
+                                <!-- Notification Dropdown -->
+                                <div class="popup-wrap noti type-header">
+                                    <div class="dropdown">
+                                        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <span class="header-item">
+                                                <span class="text-tiny">1</span>
+                                                <i class="icon-bell"></i>
+                                            </span>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-end has-content" aria-labelledby="dropdownMenuButton1" >
+                                            <li>
+                                                <h6>Message</h6>
+                                            </li>
+                                            <li>
+                                                <div class="noti-item w-full wg-user active">
+                                                    <div class="image">
+                                                        <img src="{% static 'images/avatar/user-11.png' %}" alt="">
+                                                    </div>
+                                                    <div class="flex-grow">
+                                                        <div class="flex items-center justify-between">
+                                                            <a href="#" class="body-title">Cameron Williamson</a>
+                                                            <div class="time">10:13 PM</div>
+                                                        </div>
+                                                        <div class="text-tiny">Hello?</div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li>
+                                                <div class="noti-item w-full wg-user active">
+                                                    <div class="image">
+                                                        <img src="{% static 'images/avatar/user-12.png' %}" alt="">
+                                                    </div>
+                                                    <div class="flex-grow">
+                                                        <div class="flex items-center justify-between">
+                                                            <a href="#" class="body-title">Ralph Edwards</a>
+                                                            <div class="time">10:13 PM</div>
+                                                        </div>
+                                                        <div class="text-tiny">Are you there?  interested i this...</div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li>
+                                                <div class="noti-item w-full wg-user active">
+                                                    <div class="image">
+                                                        <img src="{% static 'images/avatar/user-13.png' %}" alt="">
+                                                    </div>
+                                                    <div class="flex-grow">
+                                                        <div class="flex items-center justify-between">
+                                                            <a href="#" class="body-title">Eleanor Pena</a>
+                                                            <div class="time">10:13 PM</div>
+                                                        </div>
+                                                        <div class="text-tiny">Interested in this loads?</div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li>
+                                                <div class="noti-item w-full wg-user active">
+                                                    <div class="image">
+                                                        <img src="{% static 'images/avatar/user-11.png' %}" alt="">
+                                                    </div>
+                                                    <div class="flex-grow">
+                                                        <div class="flex items-center justify-between">
+                                                            <a href="#" class="body-title">Jane Cooper</a>
+                                                            <div class="time">10:13 PM</div>
+                                                        </div>
+                                                        <div class="text-tiny">Okay...Do we have a deal?</div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li><a href="#" class="tf-button w-full">View all</a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <!-- Message Dropdown -->
+                                <div class="popup-wrap message type-header">
+                                    <div class="dropdown">
+                                        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton2" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <span class="header-item">
+                                                <span class="text-tiny">1</span>
+                                                <i class="icon-message-square"></i>
+                                            </span>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-end has-content" aria-labelledby="dropdownMenuButton2" >
+                                            <li>
+                                                <h6>Notifications</h6>
+                                            </li>
+                                            <li>
+                                                <div class="message-item item-1">
+                                                    <div class="image">
+                                                        <i class="icon-noti-1"></i>
+                                                    </div>
+                                                    <div>
+                                                        <div class="body-title-2">Discount available</div>
+                                                        <div class="text-tiny">Morbi sapien massa, ultricies at rhoncus at, ullamcorper nec diam</div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li>
+                                                <div class="message-item item-2">
+                                                    <div class="image">
+                                                        <i class="icon-noti-2"></i>
+                                                    </div>
+                                                    <div>
+                                                        <div class="body-title-2">New customer registered</div>
+                                                        <div class="text-tiny">Aliquam erat volutpat. Sed non neque elit. Sed ut imperdiet nisi.</div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li>
+                                                <div class="message-item item-3">
+                                                    <div class="image">
+                                                        <i class="icon-noti-3"></i>
+                                                    </div>
+                                                    <div>
+                                                        <div class="body-title-2">Server rebooted</div>
+                                                        <div class="text-tiny">Praesent commodo cursus magna, vel scelerisque nisl consectetur et.</div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li>
+                                                <div class="message-item item-4">
+                                                    <div class="image">
+                                                        <i class="icon-noti-4"></i>
+                                                    </div>
+                                                    <div>
+                                                        <div class="body-title-2">New order received</div>
+                                                        <div class="text-tiny">Aenean lacinia bibendum nulla sed consectetur.</div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li><a href="#" class="tf-button w-full">View all</a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <!-- User Dropdown (Profile) -->
+                                <div class="popup-wrap user type-header">
+                                    <div class="dropdown">
+                                        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton3" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <span class="header-item">
+                                                <img src="{% static 'images/avatar/user-1.png' %}" alt="">
+                                            </span>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-end has-content" aria-labelledby="dropdownMenuButton3" >
+                                            <li>
+                                                <div class="user-info">
+                                                    <div class="image">
+                                                        <img src="{% static 'images/avatar/user-1.png' %}" alt="">
+                                                    </div>
+                                                    <div class="text">
+                                                        <div class="name">John Doe</div>
+                                                        <div class="email">johndoe@example.com</div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li>
+                                                <a href="#" class="dropdown-item">
+                                                    <i class="icon-user"></i> Profile
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a href="#" class="dropdown-item">
+                                                    <i class="icon-settings"></i> Settings
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a href="{% url 'logout' %}" class="dropdown-item">
+                                                    <i class="icon-power"></i> Logout
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /Topbar -->
+
+                    <!-- Main Content (customized form) -->
+                    <div class="main-content">
+                        <div class="main-content-inner">
+                            <div class="main-content-wrap">
+                                <div class="atm-form-card">
+                                    <h2>Add New Customer</h2>
+                                    {% if form.errors %}
+                                        <div class="atm-form-errors">
+                                            Please correct the errors below.
+                                        </div>
+                                    {% endif %}
+                                    <form method="post" enctype="multipart/form-data" autocomplete="off">
+                                        {% csrf_token %}
+                                        {% for field in form %}
+                                            <div class="atm-form-group">
+                                                {{ field.label_tag }}
+                                                {{ field }}
+                                                {% if field.help_text %}
+                                                    <div class="helptext">{{ field.help_text }}</div>
+                                                {% endif %}
+                                                {% for error in field.errors %}
+                                                    <div class="atm-form-errors">{{ error }}</div>
+                                                {% endfor %}
+                                            </div>
+                                        {% endfor %}
+                                        <!-- Signature Pad Section (Touch/Mouse/Finger) -->
+                                        <div class="signature-pad-section">
+                                            <h4>Draw Signature (Touch/Mouse/Finger)</h4>
+                                            <svg id="signatureSVG" width="320" height="120" style="border:1px solid #ccc; background:transparent; cursor:crosshair;"></svg>
+                                            <div style="margin-top:10px;">
+                                                <button id="clearSignaturePadBtn" class="btn btn-secondary" type="button">Clear</button>
+                                            </div>
+                                            <input type="hidden" name="fingerprint_canvas" id="fingerprintCanvasInput"> 
+                                        </div>
+                                        <!-- Camera Capture Section -->
+                                        <div class="camera-capture-section">
+                                            <h4>Capture Signature via Camera</h4>
+                                            <button id="openCameraBtn" class="btn btn-secondary" type="button">Open Camera</button>
+                                            <video id="signatureVideo" width="320" height="240" autoplay style="display:none; border:1px solid #ccc;"></video>
+                                            <canvas id="signatureCanvas" width="320" height="240" style="display:none; border:1px solid #ccc;"></canvas>
+                                            <div style="margin-top:10px;">
+                                                <button id="captureSignatureBtn" class="btn btn-primary" type="button" style="display:none;">Capture Signature</button>
+                                            </div>
+                                            <input type="hidden" name="fingerprint_camera" id="fingerprintCameraInput">
+                                        </div>
+                                        <button type="submit" class="tf-button w-full">Save</button>
+                                    </form>
+                                    <a href="{% url 'dashboard' %}" class="back-link"><i class="icon-arrow-left"></i> Back to Dashboard</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /Main Content -->
+
+                    <!-- Bottom Bar -->
+                    <div class="bottom-page" style="margin-top:40px;text-align:center;">
+                        <div class="body-text">
+                            Copyright © 2025 CoopBank, Designed by
+                            <a href="mailto:martinmalopa@gmail.com">Martin Malopa</a>. All rights reserved.
+                        </div>
+                    </div>
+                    <!-- /Bottom Bar -->
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="{% static 'js/jquery.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap-select.min.js' %}"></script>
+    <script src="{% static 'js/main.js' %}"></script>
+    <script>
+    // Signature Pad SVG Drawing Logic (Touch/Mouse/Finger)
+    const signatureSVG = document.getElementById('signatureSVG');
+    const clearSignaturePadBtn = document.getElementById('clearSignaturePadBtn');
+    const fingerprintCanvasInput = document.getElementById('fingerprintCanvasInput');
+    let drawing = false;
+    let lastPoint = null;
+    let pathData = '';
+    let pathElement = null;
+    function getPoint(e) {
+        if (e.touches && e.touches.length > 0) {
+            const rect = signatureSVG.getBoundingClientRect();
+            return {
+                x: e.touches[0].clientX - rect.left,
+                y: e.touches[0].clientY - rect.top
+            };
+        } else {
+            return { x: e.offsetX, y: e.offsetY };
+        }
+    }
+    signatureSVG.addEventListener('mousedown', function(e) {
+        drawing = true;
+        const pt = getPoint(e);
+        lastPoint = pt;
+        pathData += `M${pt.x},${pt.y} `;
+        if (!pathElement) {
+            pathElement = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            pathElement.setAttribute('stroke', 'black');
+            pathElement.setAttribute('stroke-width', '2');
+            pathElement.setAttribute('fill', 'none');
+            signatureSVG.appendChild(pathElement);
+        }
+    });
+    signatureSVG.addEventListener('mousemove', function(e) {
+        if (!drawing) return;
+        const pt = getPoint(e);
+        pathData += `L${pt.x},${pt.y} `;
+        if (pathElement) pathElement.setAttribute('d', pathData);
+        lastPoint = pt;
+    });
+    window.addEventListener('mouseup', function() {
+        drawing = false;
+        lastPoint = null;
+    });
+    // Touch events
+    signatureSVG.addEventListener('touchstart', function(e) {
+        drawing = true;
+        const pt = getPoint(e);
+        lastPoint = pt;
+        pathData += `M${pt.x},${pt.y} `;
+        if (!pathElement) {
+            pathElement = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            pathElement.setAttribute('stroke', 'black');
+            pathElement.setAttribute('stroke-width', '2');
+            pathElement.setAttribute('fill', 'none');
+            signatureSVG.appendChild(pathElement);
+        }
+        e.preventDefault();
+    });
+    signatureSVG.addEventListener('touchmove', function(e) {
+        if (!drawing) return;
+        const pt = getPoint(e);
+        pathData += `L${pt.x},${pt.y} `;
+        if (pathElement) pathElement.setAttribute('d', pathData);
+        lastPoint = pt;
+        e.preventDefault();
+    });
+    window.addEventListener('touchend', function() {
+        drawing = false;
+        lastPoint = null;
+    });
+    clearSignaturePadBtn.onclick = function() {
+        pathData = '';
+        if (pathElement) {
+            signatureSVG.removeChild(pathElement);
+            pathElement = null;
+        }
+    };
+    // Convert SVG to PNG and store in hidden input before form submit
+    document.querySelector('form[method="post"]').addEventListener('submit', function(e) {
+        e.preventDefault(); // Prevent default form submission
+        const canvas = document.createElement('canvas');
+        canvas.width = 320;
+        canvas.height = 120;
+        const ctx = canvas.getContext('2d');
+        const svgData = new XMLSerializer().serializeToString(signatureSVG);
+        const img = new Image();
+        img.onload = function() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(img, 0, 0);
+            fingerprintCanvasInput.value = canvas.toDataURL('image/png');
+            e.target.submit(); // Now submit the form
+        };
+        img.src = 'data:image/svg+xml;base64,' + btoa(svgData);
+    });
+    // Camera capture logic
+    const openCameraBtn = document.getElementById('openCameraBtn');
+    const signatureVideo = document.getElementById('signatureVideo');
+    const signatureCanvas = document.getElementById('signatureCanvas');
+    const captureSignatureBtn = document.getElementById('captureSignatureBtn');
+    const fingerprintCameraInput = document.getElementById('fingerprintCameraInput');
+    let stream;
+    openCameraBtn.onclick = async function() {
+        stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        signatureVideo.srcObject = stream;
+        signatureVideo.style.display = 'block';
+        signatureCanvas.style.display = 'none';
+        captureSignatureBtn.style.display = 'inline-block';
+    };
+    captureSignatureBtn.onclick = function() {
+        signatureCanvas.getContext('2d').drawImage(signatureVideo, 0, 0, signatureCanvas.width, signatureCanvas.height);
+        signatureCanvas.style.display = 'block';
+        signatureVideo.style.display = 'none';
+        if (stream) {
+            stream.getTracks().forEach(track => track.stop());
+        }
+        // Store camera image in hidden input
+        fingerprintCameraInput.value = signatureCanvas.toDataURL('image/png');
+    };
+    </script>
+</body>
+</html>
