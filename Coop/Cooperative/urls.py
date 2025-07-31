@@ -8,4 +8,5 @@ urlpatterns = [
     path('', views.dashboard, name='dashboard'),
     path('add-visitor/', views.add_visitor, name='add_visitor'),
     path('send-mass-sms/', views.send_mass_sms, name='send_mass_sms'),
+    path('mobile-signature/<str:session_id>/', views.mobile_signature, name='mobile_signature'),
 ]

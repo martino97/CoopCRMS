@@ -19,6 +19,7 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from Cooperative import views
+import os
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -28,11 +29,13 @@ urlpatterns = [
     path('logout/', views.logout_view, name='logout'),
     path('add-customer/', views.add_customer, name='add_customer'),
     path('recapture-signature/', views.recapture_signature, name='recapture_signature'),
-
-    # ADD THIS LINE to include all app URLs (including send_mass_sms)
     path('coop/', include('Cooperative.urls')),
 ]
 
 # Serve media files during development
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+# Create media directories if they don't exist
+os.makedirs(os.path.join(settings.MEDIA_ROOT, settings.CUSTOMER_PHOTO_DIR), exist_ok=True)
+os.makedirs(os.path.join(settings.MEDIA_ROOT, settings.SIGNATURE_DIR), exist_ok=True)

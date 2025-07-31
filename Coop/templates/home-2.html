@@ -863,36 +863,54 @@
                                             </div>
                                         </div>
                                         <div class="wg-table table-product-overview t1">
-                                            <ul class="table-title flex gap10 mb-14">
-                                                <li><div class="body-title">Name</div></li>
-                                                <li><div class="body-title">Phone</div></li>
-                                                <li><div class="body-title">Account #</div></li>
-                                                <li><div class="body-title">Card #</div></li>
-                                                <li><div class="body-title">Type</div></li>
-                                                <li><div class="body-title">Date</div></li>
-                                                <li><div class="body-title">Photo</div></li>
-                                                <li><div class="body-title">Signature</div></li>
-                                                <li><div class="body-title">Remarks</div></li>
-                                            </ul>
-                                            <div class="divider mb-14"></div>
-                                            <ul class="flex flex-column gap10">
-                                                {% for card in atm_cards %}
-                                                <li class="product-item gap14">
-                                                    <div class="flex items-center justify-between flex-grow gap20">
-                                                        <div class="body-text">{{ card.customer_name }}</div>
-                                                        <div class="body-text">{{ card.customer_phone }}</div>
-                                                        <div class="body-text">{{ card.account_number }}</div>
-                                                        <div class="body-text">{{ card.card_number }}</div>
-                                                        <div class="body-text">{{ card.request_type }}</div>
-                                                        <div class="body-text">{{ card.request_date|date:"Y-m-d" }}</div>
-                                                        <div class="body-text">{% if card.signature %}<img src="{{ card.signature.url }}" alt="Signature" style="height:30px;">{% else %}-{% endif %}</div>
-                                                        <div class="body-text">{% if card.fingerprint %}<img src="{{ card.fingerprint.url }}" alt="Fingerprint" style="height:30px;">{% else %}-{% endif %}</div>
-                                                        <div class="body-text">{{ card.remarks }}</div>
-                                                    </div>
-                                                </li>
-                                                <li class="divider"></li>
-                                                {% endfor %}
-                                            </ul>
+                                            <!-- In home-2.html, update the table to handle missing photo field -->
+<ul class="table-title flex gap10 mb-14">
+    <li><div class="body-title">Name</div></li>
+    <li><div class="body-title">Phone</div></li>
+    <li><div class="body-title">Account #</div></li>
+    <li><div class="body-title">Card #</div></li>
+    <li><div class="body-title">Type</div></li>
+    <li><div class="body-title">Date</div></li>
+    <li><div class="body-title">Photo</div></li>
+    <li><div class="body-title">Signature</div></li>
+    <li><div class="body-title">Remarks</div></li>
+</ul>
+<div class="divider mb-14"></div>
+<ul class="flex flex-column gap10">
+    {% for card in atm_cards %}
+    <li class="product-item gap14">
+        <div class="flex items-center justify-between flex-grow gap20">
+            <div class="body-text">{{ card.customer_name }}</div>
+            <div class="body-text">{{ card.customer_phone }}</div>
+            <div class="body-text">{{ card.account_number }}</div>
+            <div class="body-text">{{ card.card_number }}</div>
+            <div class="body-text">{{ card.request_type }}</div>
+            <div class="body-text">{{ card.request_date|date:"Y-m-d" }}</div>
+            <div class="body-text">
+                {% if card.fingerprint %}
+                    <img src="{{ card.fingerprint.url }}" 
+                         alt="Photo" 
+                         style="width:40px;height:40px;border-radius:50%;object-fit:cover;"
+                         onerror="this.onerror=null;this.src='{% static 'images/default-avatar.png' %}';">
+                {% else %}
+                <div style="width:40px;height:40px;border-radius:50%;background:#e0e0e0;display:inline-flex;align-items:center;justify-content:center;font-size:18px;color:#666;">
+                    {{ card.customer_name|first|default:"?" }}
+                </div>
+                {% endif %}
+            </div>
+            <div class="body-text">
+                {% if card.signature %}
+                    <img src="{{ card.signature.url }}" alt="Signature" style="height:30px;">
+                {% else %}
+                    -
+                {% endif %}
+            </div>
+            <div class="body-text">{{ card.remarks|default:"-" }}</div>
+        </div>
+    </li>
+    <li class="divider"></li>
+    {% endfor %}
+</ul>
                                         </div>
                                         <div class="divider"></div>
                                         <div class="flex items-center justify-between flex-wrap gap10">
@@ -935,7 +953,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         body: JSON.stringify({messages: messages})
                     })
                     .then(response => response.json())
-                    .then(data => {
+                    .then data => {
                         alert("Ujumbe umetumwa kwa wateja wote!");
                     })
                     .catch(error => {

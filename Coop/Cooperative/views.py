@@ -1,28 +1,63 @@
-# Add customer view
+from django.contrib import messages
+from django.shortcuts import render, redirect
 from .forms import ATMRegisterBookForm
+from django.contrib.auth.decorators import login_required
+from datetime import datetime
+import base64
+from django.core.files.base import ContentFile
+from django.conf import settings
+from django.core.exceptions import ValidationError
+from .utils import process_signature_to_png
 
+@login_required 
 def add_customer(request):
-    import base64
-    from django.core.files.base import ContentFile
     if request.method == 'POST':
-        form = ATMRegisterBookForm(request.POST, request.FILES)
-        if form.is_valid():
-            instance = form.save(commit=False)
-            canvas_data = request.POST.get('fingerprint_canvas')
-            if canvas_data and canvas_data.startswith('data:image/png;base64,'):
-                format, imgstr = canvas_data.split(';base64,')
-                img_data = base64.b64decode(imgstr)
-                instance.fingerprint.save('fingerprint_canvas.png', ContentFile(img_data), save=False)
-            camera_data = request.POST.get('fingerprint_camera')
-            if (not canvas_data or not canvas_data.startswith('data:image/png;base64,')) and camera_data and camera_data.startswith('data:image/png;base64,'):
-                format, imgstr = camera_data.split(';base64,')
-                img_data = base64.b64decode(imgstr)
-                instance.fingerprint.save('fingerprint_camera.png', ContentFile(img_data), save=False)
-            instance.save()
-            return redirect('dashboard')
+        try:
+            # Get both photo and signature data
+            photo_data = request.POST.get('fingerprint', '')
+            signature_data = request.POST.get('signature_data', '')
+            
+            form = ATMRegisterBookForm(request.POST)
+            if form.is_valid():
+                instance = form.save(commit=False)
+                
+                # Process photo
+                if photo_data and photo_data.startswith('data:image'):
+                    try:
+                        format, imgstr = photo_data.split(';base64,')
+                        img_data = base64.b64decode(imgstr)
+                        photo_filename = f'fingerprint_{datetime.now().strftime("%Y%m%d_%H%M%S")}.png'
+                        instance.fingerprint.save(photo_filename, ContentFile(img_data), save=False)
+                    except Exception as e:
+                        print(f"Photo error: {str(e)}")
+                        raise ValidationError(f'Error processing photo: {str(e)}')
+
+                # Process signature
+                if signature_data and signature_data.startswith('data:image'):
+                    try:
+                        format, imgstr = signature_data.split(';base64,')
+                        img_data = base64.b64decode(imgstr)
+                        sig_filename = f'signature_{datetime.now().strftime("%Y%m%d_%H%M%S")}.png'
+                        instance.signature.save(sig_filename, ContentFile(img_data), save=False)
+                    except Exception as e:
+                        print(f"Signature error: {str(e)}")
+                        raise ValidationError(f'Error processing signature: {str(e)}')
+
+                # Save the instance
+                instance.save()
+                messages.success(request, 'Customer added successfully!')
+                return redirect('dashboard')
+            else:
+                print(f"Form errors: {form.errors}")
+                messages.error(request, f'Form validation failed: {form.errors}')
+        except Exception as e:
+            print(f"Error saving customer: {str(e)}")
+            messages.error(request, str(e))
     else:
         form = ATMRegisterBookForm()
+    
     return render(request, 'add_customer.html', {'form': form})
+
 from django.shortcuts import render, redirect
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import login, logout, authenticate
@@ -61,8 +96,16 @@ def logout_view(request):
 # Dashboard view (ensure @login_required)
 @login_required
 def dashboard(request):
-    from .models import ATMRegisterBook
-    atm_cards = ATMRegisterBook.objects.all()
+    try:
+        from .models import ATMRegisterBook
+        atm_cards = ATMRegisterBook.objects.all()
+        # Add debug logging
+        for card in atm_cards:
+            print(f"Card {card.id} fingerprint: {card.fingerprint}")
+    except Exception as e:
+        print(f"Error fetching ATM cards: {e}")
+        atm_cards = []
+    
     return render(request, 'home-2.html', {'atm_cards': atm_cards})
 
 # Signature recapture view
@@ -124,3 +167,16 @@ def send_mass_sms(request):
                 print(f"Failed to send to {msg['phone']}: {e}")
         return JsonResponse({"status": "success"})
     return JsonResponse({"error": "Invalid request"}, status=400)
+
+@login_required
+def mobile_signature(request):
+    """Handle mobile signature photo capture"""
+    if request.method == 'POST' and request.FILES.get('signature'):
+        try:
+            signature_file = request.FILES['signature']
+            # Process file and return processed signature
+            # Add your processing logic here
+            return JsonResponse({'status': 'success', 'data': processed_signature})
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)})
+    return render(request, 'mobile_signature.html')

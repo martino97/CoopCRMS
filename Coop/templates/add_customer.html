@@ -3,6 +3,8 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
+    <!-- ADD THIS for mobile responsiveness -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Add New Customer</title>
     <link rel="stylesheet" type="text/css" href="{% static 'css/animate.min.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'css/animation.css' %}">
@@ -47,7 +49,7 @@
             border: 1.5px solid #cfd8dc;
             border-radius: 6px;
             background: #fff;
-            font-size: 1rem;
+            font-size: 16px; /* MODIFIED: Prevents zoom on iOS */
             transition: border 0.2s;
         }
         .atm-form-group input:focus,
@@ -83,14 +85,14 @@
         .tf-button.w-full:hover {
             background: linear-gradient(90deg, #1565c0 0%, #1e88e5 100%);
         }
-        .signature-pad-section, .camera-capture-section {
+        .signature-pad-section, .camera-capture-section, .photo-capture-section {
             background: #fff;
             border-radius: 8px;
             padding: 18px 18px 12px 18px;
             margin-bottom: 18px;
             box-shadow: 0 2px 8px rgba(33,150,243,0.07);
         }
-        .signature-pad-section h4, .camera-capture-section h4 {
+        .signature-pad-section h4, .camera-capture-section h4, .photo-capture-section h4 {
             font-size: 1.1rem;
             color: #1976d2;
             margin-bottom: 12px;
@@ -105,23 +107,177 @@
         .atm-form-card .back-link:hover {
             text-decoration: underline;
         }
+        
+        /* ADD NEW STYLES for photo capture */
+        .photo-preview {
+            width: 200px;
+            height: 200px;
+            background: #f0f0f0;
+            border-radius: 8px;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        #photoVideo {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        #capturedPhotoImg {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+        }
+        
+        .photo-placeholder {
+            text-align: center;
+            color: #999;
+        }
+        
+        .camera-controls {
+            text-align: center;
+        }
+        
+        .camera-btn {
+            background: #1976d2;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            margin: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .camera-btn:hover {
+            background: #1565c0;
+        }
+        
+        .camera-btn.secondary {
+            background: #757575;
+        }
+        
+        .camera-btn.success {
+            background: #4caf50;
+        }
+        
+        /* Add to your existing styles */
+        .signature-preview {
+            width: 320px;
+            height: 200px;
+            background: #fff;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            margin: 0 auto 15px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #signaturePad {
+            position: absolute;
+            top: 0;
+            left: 0;
+            touch-action: none;
+            background: transparent;
+        }
+
+        #signaturePreview {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background: #fff;
+        }
+
+        .signature-controls {
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .photo-preview {
+                width: 280px;
+                height: 280px;
+            }
+            
+            #signaturePad {
+                width: 100%;
+                height: 100%;
+            }
+        }
+
         /* Responsive */
         @media (max-width: 700px) {
             .atm-form-card {
-                padding: 18px 6vw 18px 6vw;
+                padding: 20px;
+                margin: 20px 10px;
+            }
+            .section-menu-left {
+                display: none; /* Hide sidebar on mobile */
+            }
+            .section-content-right {
+                margin-left: 0;
+            }
+            .header-dashboard .header-left {
+                flex-wrap: wrap;
+            }
+            .form-search {
+                display: none; /* Hide search on mobile */
             }
         }
+        
+        /* Add these to your existing styles */
+        .signature-container {
+            touch-action: none;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            max-width: 100%;
+            overflow: hidden;
+        }
+
+        /* Add these styles to your existing <style> section */
+        #qrcodeContainer {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    margin: 15px auto;
+    max-width: 240px;
+}
+
+#qrcode {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 200px;
+}
+
+#qrcode img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+}
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode.js@1.0.0/qrcode.min.js"></script>
 </head>
 <body class="body">
     <div id="wrapper">
         <div id="page" class="">
             <div class="layout-wrap">
                 <!-- Sidebar (from home-2.html) -->
-                <div class="section-menu-left">
+                <div class="section-menu-left" role="navigation" aria-label="Main navigation">
                     <div class="box-logo">
                         <a href="{% url 'dashboard' %}" id="site-logo-inner">
-                            <img id="logo_header" alt="CoopLogo"
+                            <img id="logo_header" alt="CoopLogo" title="CoopLogo"
                                  src="{% static 'images/CoopLogo.png' %}"
                                  data-light="{% static 'images/CoopLogo.png' %}"
                                  data-dark="{% static 'images/CoopLogo.png' %}"
@@ -143,7 +299,6 @@
                                         </a>
                                         <ul class="sub-menu">
                                             <li class="sub-menu-item">
-                                                <a href="{% url 'dashboard' %}">
                                                     <div class="text">Home 01</div>
                                                 </a>
                                             </li>
@@ -247,14 +402,18 @@
                                     <h6>Hi, how can we help?</h6>
                                     <div class="text">Contact us if you have any assistance, we will contact you as soon as possible</div>
                                 </div>
-                                <a href="info@cbtbank.co.tzclass="tf-button w-full">Contact Us</a>
+                                <a href="info@cbtbank.co.tz" class="tf-button w-full">Contact Us</a>
                                  <div class="center-item">
-                                <ul class="wg-social">
+                                <ul class="wg-social" role="list">
                                     <li>
-                                        <a href="https://www.facebook.com/coopbanktanzania/"><i class="icon-facebook"></i></a>
+                                        <a href="https://www.facebook.com/coopbanktanzania/" title="Visit our Facebook page" aria-label="Facebook">
+                                            <i class="icon-facebook" aria-hidden="true"></i>
+                                        </a>
                                     </li>
                                     <li class="active">
-                                        <a href="https://twitter.com/coopbank"><i class="icon-twitter"></i></a>
+                                        <a href="https://twitter.com/coopbank" title="Visit our Twitter page" aria-label="Twitter">
+                                            <i class="icon-twitter" aria-hidden="true"></i>
+                                        </a>
                                     </li>
                                     <li>
                                         <a href="https://www.linkedin.com/company/coop-bank-tanzania/posts/?feedView=all"><i class="icon-linkedin"></i></a>
@@ -272,7 +431,7 @@
 
                 <div class="section-content-right">
                     <!-- Topbar (from home-2.html) -->
-                    <div class="header-dashboard">
+                    <div class="header-dashboard" role="banner" aria-label="Dashboard header">
                         <div class="wrap">
                             <div class="header-left">
                                 <a href="{% url 'dashboard' %}">
@@ -283,7 +442,14 @@
                                 </div>
                                 <form class="form-search flex-grow">
                                     <fieldset class="name">
-                                        <input type="text" placeholder="Search here..." class="show-search" name="name" tabindex="2" value="" aria-required="true" required="">
+                                        <input type="text" 
+    placeholder="Search here..." 
+    class="show-search" 
+    name="name" 
+    tabindex="2" 
+    aria-label="Search"
+    title="Search input"
+    required>
                                     </fieldset>
                                     <div class="button-submit">
                                         <button class="" type="submit"><i class="icon-search"></i></button>
@@ -292,9 +458,9 @@
                             </div>
                             <div class="header-grid">
                                 <div class="header-item country">
-                                    <select class="image-select no-text">
-                                        <option data-thumbnail="{% static 'images/country/1.png' %}">ENG</option>
-                                        <option data-thumbnail="{% static 'images/country/9.png' %}">VIE</option>
+                                    <select class="image-select no-text" title="Select language" aria-label="Select language">
+                                        <option data-thumbnail="{% static 'images/country/1.png' %}" title="English">ENG</option>
+                                        <option data-thumbnail="{% static 'images/country/9.png' %}" title="Vietnamese">VIE</option>
                                     </select>
                                 </div>
                                 <div class="header-item button-dark-light">
@@ -303,10 +469,10 @@
                                 <!-- Notification Dropdown -->
                                 <div class="popup-wrap noti type-header">
                                     <div class="dropdown">
-                                        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false" title="Notifications dropdown">
                                             <span class="header-item">
-                                                <span class="text-tiny">1</span>
-                                                <i class="icon-bell"></i>
+                                                <span class="text-tiny" aria-label="Notification count">1</span>
+                                                <i class="icon-bell" aria-hidden="true"></i>
                                             </span>
                                         </button>
                                         <ul class="dropdown-menu dropdown-menu-end has-content" aria-labelledby="dropdownMenuButton1" >
@@ -348,137 +514,137 @@
                                                     </div>
                                                     <div class="flex-grow">
                                                         <div class="flex items-center justify-between">
-                                                            <a href="#" class="body-title">Eleanor Pena</a>
-                                                            <div class="time">10:13 PM</div>
-                                                        </div>
-                                                        <div class="text-tiny">Interested in this loads?</div>
-                                                    </div>
-                                                </div>
-                                            </li>
-                                            <li>
-                                                <div class="noti-item w-full wg-user active">
-                                                    <div class="image">
-                                                        <img src="{% static 'images/avatar/user-11.png' %}" alt="">
-                                                    </div>
-                                                    <div class="flex-grow">
-                                                        <div class="flex items-center justify-between">
-                                                            <a href="#" class="body-title">Jane Cooper</a>
-                                                            <div class="time">10:13 PM</div>
-                                                        </div>
-                                                        <div class="text-tiny">Okay...Do we have a deal?</div>
-                                                    </div>
-                                                </div>
-                                            </li>
-                                            <li><a href="#" class="tf-button w-full">View all</a></li>
-                                        </ul>
-                                    </div>
-                                </div>
-                                <!-- Message Dropdown -->
-                                <div class="popup-wrap message type-header">
-                                    <div class="dropdown">
-                                        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton2" data-bs-toggle="dropdown" aria-expanded="false">
-                                            <span class="header-item">
-                                                <span class="text-tiny">1</span>
-                                                <i class="icon-message-square"></i>
-                                            </span>
-                                        </button>
-                                        <ul class="dropdown-menu dropdown-menu-end has-content" aria-labelledby="dropdownMenuButton2" >
-                                            <li>
-                                                <h6>Notifications</h6>
-                                            </li>
-                                            <li>
-                                                <div class="message-item item-1">
-                                                    <div class="image">
-                                                        <i class="icon-noti-1"></i>
-                                                    </div>
-                                                    <div>
-                                                        <div class="body-title-2">Discount available</div>
-                                                        <div class="text-tiny">Morbi sapien massa, ultricies at rhoncus at, ullamcorper nec diam</div>
-                                                    </div>
-                                                </div>
-                                            </li>
-                                            <li>
-                                                <div class="message-item item-2">
-                                                    <div class="image">
-                                                        <i class="icon-noti-2"></i>
-                                                    </div>
-                                                    <div>
-                                                        <div class="body-title-2">New customer registered</div>
-                                                        <div class="text-tiny">Aliquam erat volutpat. Sed non neque elit. Sed ut imperdiet nisi.</div>
-                                                    </div>
-                                                </div>
-                                            </li>
-                                            <li>
-                                                <div class="message-item item-3">
-                                                    <div class="image">
-                                                        <i class="icon-noti-3"></i>
-                                                    </div>
-                                                    <div>
-                                                        <div class="body-title-2">Server rebooted</div>
-                                                        <div class="text-tiny">Praesent commodo cursus magna, vel scelerisque nisl consectetur et.</div>
-                                                    </div>
-                                                </div>
-                                            </li>
-                                            <li>
-                                                <div class="message-item item-4">
-                                                    <div class="image">
-                                                        <i class="icon-noti-4"></i>
-                                                    </div>
-                                                    <div>
-                                                        <div class="body-title-2">New order received</div>
-                                                        <div class="text-tiny">Aenean lacinia bibendum nulla sed consectetur.</div>
-                                                    </div>
-                                                </div>
-                                            </li>
-                                            <li><a href="#" class="tf-button w-full">View all</a></li>
-                                        </ul>
-                                    </div>
-                                </div>
-                                <!-- User Dropdown (Profile) -->
-                                <div class="popup-wrap user type-header">
-                                    <div class="dropdown">
-                                        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton3" data-bs-toggle="dropdown" aria-expanded="false">
-                                            <span class="header-item">
-                                                <img src="{% static 'images/avatar/user-1.png' %}" alt="">
-                                            </span>
-                                        </button>
-                                        <ul class="dropdown-menu dropdown-menu-end has-content" aria-labelledby="dropdownMenuButton3" >
-                                            <li>
-                                                <div class="user-info">
-                                                    <div class="image">
-                                                        <img src="{% static 'images/avatar/user-1.png' %}" alt="">
-                                                    </div>
-                                                    <div class="text">
-                                                        <div class="name">John Doe</div>
-                                                        <div class="email">johndoe@example.com</div>
-                                                    </div>
-                                                </div>
-                                            </li>
-                                            <li>
-                                                <a href="#" class="dropdown-item">
-                                                    <i class="icon-user"></i> Profile
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a href="#" class="dropdown-item">
-                                                    <i class="icon-settings"></i> Settings
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a href="{% url 'logout' %}" class="dropdown-item">
-                                                    <i class="icon-power"></i> Logout
-                                                </a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </div>
+    <a href="#" class="body-title">Eleanor Pena</a>
+    <div class="time">10:13 PM</div>
+</div>
+<div class="text-tiny">Interested in this loads?</div>
+</div>
+</div>
+</li>
+<li>
+    <div class="noti-item w-full wg-user active">
+        <div class="image">
+            <img src="{% static 'images/avatar/user-11.png' %}" alt="">
+        </div>
+        <div class="flex-grow">
+            <div class="flex items-center justify-between">
+                <a href="#" class="body-title">Jane Cooper</a>
+                <div class="time">10:13 PM</div>
+            </div>
+            <div class="text-tiny">Okay...Do we have a deal?</div>
+        </div>
+    </div>
+</li>
+<li><a href="#" class="tf-button w-full">View all</a></li>
+</ul>
+</div>
+</div>
+<!-- Message Dropdown -->
+<div class="popup-wrap message type-header">
+    <div class="dropdown">
+        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton2" data-bs-toggle="dropdown" aria-expanded="false">
+            <span class="header-item">
+                <span class="text-tiny">1</span>
+                <i class="icon-message-square"></i>
+            </span>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end has-content" aria-labelledby="dropdownMenuButton2" >
+            <li>
+                <h6>Notifications</h6>
+            </li>
+            <li>
+                <div class="message-item item-1">
+                    <div class="image">
+                        <i class="icon-noti-1"></i>
+                    </div>
+                    <div>
+                        <div class="body-title-2">Discount available</div>
+                        <div class="text-tiny">Morbi sapien massa, ultricies at rhoncus at, ullamcorper nec diam</div>
+                    </div>
+                </div>
+            </li>
+            <li>
+                <div class="message-item item-2">
+                    <div class="image">
+                        <i class="icon-noti-2"></i>
+                    </div>
+                    <div>
+                        <div class="body-title-2">New customer registered</div>
+                        <div class="text-tiny">Aliquam erat volutpat. Sed non neque elit. Sed ut imperdiet nisi.</div>
+                    </div>
+                </div>
+            </li>
+            <li>
+                <div class="message-item item-3">
+                    <div class="image">
+                        <i class="icon-noti-3"></i>
+                    </div>
+                    <div>
+                        <div class="body-title-2">Server rebooted</div>
+                        <div class="text-tiny">Praesent commodo cursus magna, vel scelerisque nisl consectetur et.</div>
+                    </div>
+                </div>
+            </li>
+            <li>
+                <div class="message-item item-4">
+                    <div class="image">
+                        <i class="icon-noti-4"></i>
+                    </div>
+                    <div>
+                        <div class="body-title-2">New order received</div>
+                        <div class="text-tiny">Aenean lacinia bibendum nulla sed consectetur.</div>
+                    </div>
+                </div>
+            </li>
+            <li><a href="#" class="tf-button w-full">View all</a></li>
+        </ul>
+    </div>
+</div>
+<!-- User Dropdown (Profile) -->
+<div class="popup-wrap user type-header">
+    <div class="dropdown">
+        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton3" data-bs-toggle="dropdown" aria-expanded="false">
+            <span class="header-item">
+                <img src="{% static 'images/avatar/user-1.png' %}" alt="">
+            </span>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end has-content" aria-labelledby="dropdownMenuButton3" >
+            <li>
+                <div class="user-info">
+                    <div class="image">
+                        <img src="{% static 'images/avatar/user-1.png' %}" alt="">
+                    </div>
+                    <div class="text">
+                        <div class="name">John Doe</div>
+                        <div class="email">johndoe@example.com</div>
+                    </div>
+                </div>
+            </li>
+            <li>
+                <a href="#" class="dropdown-item">
+                    <i class="icon-user"></i> Profile
+                </a>
+            </li>
+            <li>
+                <a href="#" class="dropdown-item">
+                    <i class="icon-settings"></i> Settings
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'logout' %}" class="dropdown-item">
+                    <i class="icon-power"></i> Logout
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>
                             </div>
                         </div>
                     </div>
                     <!-- /Topbar -->
 
                     <!-- Main Content (customized form) -->
-                    <div class="main-content">
+                    <div class="main-content" role="main" aria-label="Main content">
                         <div class="main-content-inner">
                             <div class="main-content-wrap">
                                 <div class="atm-form-card">
@@ -488,7 +654,7 @@
                                             Please correct the errors below.
                                         </div>
                                     {% endif %}
-                                    <form method="post" enctype="multipart/form-data" autocomplete="off">
+                                    <form method="post" enctype="multipart/form-data" autocomplete="off" role="form" aria-label="Add new customer">
                                         {% csrf_token %}
                                         {% for field in form %}
                                             <div class="atm-form-group">
@@ -502,27 +668,141 @@
                                                 {% endfor %}
                                             </div>
                                         {% endfor %}
-                                        <!-- Signature Pad Section (Touch/Mouse/Finger) -->
-                                        <div class="signature-pad-section">
-                                            <h4>Draw Signature (Touch/Mouse/Finger)</h4>
-                                            <svg id="signatureSVG" width="320" height="120" style="border:1px solid #ccc; background:transparent; cursor:crosshair;"></svg>
-                                            <div style="margin-top:10px;">
-                                                <button id="clearSignaturePadBtn" class="btn btn-secondary" type="button">Clear</button>
+                                        
+                                        <!-- ADD NEW: Customer Photo Capture Section -->
+                                        <div class="photo-capture-section">
+                                            <h4>Customer Photo</h4>
+                                            <div class="photo-preview">
+                                                <img id="capturedPhotoImg" alt="Captured photo" style="display:none; width:100%; height:100%; object-fit:cover;">
+                                                <div class="photo-placeholder" id="photoPlaceholder">
+                                                    <i class="icon-camera"></i>
+                                                    <p>Tap to take photo</p>
+                                                </div>
                                             </div>
-                                            <input type="hidden" name="fingerprint_canvas" id="fingerprintCanvasInput"> 
+                                            <div class="camera-controls">
+                                                <input type="file" id="mobilePhotoInput" accept="image/*" capture="environment" style="display:none;">
+                                                <button type="button" class="camera-btn" id="takePhotoBtn">Take Photo</button>
+                                                <button type="button" class="camera-btn secondary" id="retakePhotoBtn" style="display:none;">Retake</button>
+                                            </div>
+                                            <!-- Make sure this name matches exactly -->
+                                            <input type="hidden" name="fingerprint" id="customerPhotoData">
                                         </div>
-                                        <!-- Camera Capture Section -->
+                                        
+                                        <!-- Replace the existing signature card with this -->
+                                        <div class="card mb-4">
+    <div class="card-header bg-primary text-white">
+        <h4 class="mb-0">Customer Signature</h4>
+    </div>
+    <div class="card-body text-center">
+        <div class="signature-preview-container" id="signaturePlaceholder">
+            <input type="file" 
+                   id="signatureInput" 
+                   accept="image/*"
+                   capture="environment"
+                   style="display: none;">
+            <img src="{% static 'images/signature-icon.png' %}" alt="Signature placeholder" class="placeholder-image">
+            <div class="tap-text">Tap to take signature</div>
+        </div>
+        <img id="signaturePreview" style="display:none; max-width: 100%; margin: 10px auto;">
+        <input type="hidden" id="signatureData" name="signature_data">
+    </div>
+</div>
+
+<style>
+.signature-preview-container {
+    background-color: #f8f9fa;
+    border-radius: 12px;
+    padding: 30px;
+    margin: 15px auto;
+    min-height: 300px;
+    max-width: 500px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border: 2px dashed #dee2e6;
+    transition: all 0.3s ease;
+}
+
+.signature-preview-container:hover {
+    border-color: #2196F3;
+    background-color: #f1f8fe;
+}
+
+.placeholder-image {
+    width: 80px;
+    height: 80px;
+    opacity: 0.5;
+    margin-bottom: 15px;
+}
+
+.tap-text {
+    color: #666;
+    font-size: 1.1rem;
+    margin-top: 10px;
+}
+
+#signaturePreview {
+    max-height: 300px;
+    width: auto;
+    margin: 0 auto;
+    border-radius: 8px;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const signatureInput = document.getElementById('signatureInput');
+    const signaturePreview = document.getElementById('signaturePreview');
+    const signaturePlaceholder = document.getElementById('signaturePlaceholder');
+    const signatureData = document.getElementById('signatureData');
+
+    function triggerSignatureUpload() {
+        signatureInput.click();
+    }
+
+    signaturePlaceholder.addEventListener('click', triggerSignatureUpload);
+
+    signatureInput.addEventListener('change', function(e) {
+        if (e.target.files && e.target.files[0]) {
+            const file = e.target.files[0];
+            
+            // Check file size
+            if (file.size > MAX_FILE_SIZE) {
+                alert('Signature file size too large. Maximum size is 10MB.');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                if (!validateFileSize(e.target.result)) {
+                    return;
+                }
+                signaturePreview.src = e.target.result;
+                signaturePreview.style.display = 'block';
+                signaturePlaceholder.style.display = 'none';
+                signatureData.value = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+});
+</script>
+                                        
+                                        <!-- KEEP EXISTING: Camera Capture Section for Additional Images -->
                                         <div class="camera-capture-section">
-                                            <h4>Capture Signature via Camera</h4>
-                                            <button id="openCameraBtn" class="btn btn-secondary" type="button">Open Camera</button>
-                                            <video id="signatureVideo" width="320" height="240" autoplay style="display:none; border:1px solid #ccc;"></video>
-                                            <canvas id="signatureCanvas" width="320" height="240" style="display:none; border:1px solid #ccc;"></canvas>
+                                            <h4>Additional Document Capture (Optional)</h4>
+                                            <button id="openCameraBtn" class="btn btn-secondary" type="button" title="Open camera for document capture">Open Camera</button>
+                                            <video id="signatureVideo" width="100%" height="240" autoplay style="display:none; border:1px solid #ccc;" title="Video preview"></video>
+                                            <canvas id="signatureCanvas" width="320" height="240" style="display:none; border:1px solid #ccc;" aria-label="Signature canvas"></aria-label></canvas>
                                             <div style="margin-top:10px;">
-                                                <button id="captureSignatureBtn" class="btn btn-primary" type="button" style="display:none;">Capture Signature</button>
+                                                <button id="captureDocumentBtn" class="btn btn-primary" type="button" style="display:none;" title="Capture document">Capture Document</button>
                                             </div>
                                             <input type="hidden" name="fingerprint_camera" id="fingerprintCameraInput">
                                         </div>
-                                        <button type="submit" class="tf-button w-full">Save</button>
+                                        
+                                        <button type="submit" class="tf-button w-full">Save Customer Information</button>
                                     </form>
                                     <a href="{% url 'dashboard' %}" class="back-link"><i class="icon-arrow-left"></i> Back to Dashboard</a>
                                 </div>
@@ -532,7 +812,7 @@
                     <!-- /Main Content -->
 
                     <!-- Bottom Bar -->
-                    <div class="bottom-page" style="margin-top:40px;text-align:center;">
+                    <div class="bottom-page" role="contentinfo" aria-label="Footer" style="margin-top:40px;text-align:center;">
                         <div class="body-text">
                             Copyright © 2025 CoopBank, Designed by
                             <a href="mailto:martinmalopa@gmail.com">Martin Malopa</a>. All rights reserved.
@@ -548,124 +828,182 @@
     <script src="{% static 'js/bootstrap-select.min.js' %}"></script>
     <script src="{% static 'js/main.js' %}"></script>
     <script>
-    // Signature Pad SVG Drawing Logic (Touch/Mouse/Finger)
-    const signatureSVG = document.getElementById('signatureSVG');
-    const clearSignaturePadBtn = document.getElementById('clearSignaturePadBtn');
-    const fingerprintCanvasInput = document.getElementById('fingerprintCanvasInput');
-    let drawing = false;
-    let lastPoint = null;
-    let pathData = '';
-    let pathElement = null;
-    function getPoint(e) {
-        if (e.touches && e.touches.length > 0) {
-            const rect = signatureSVG.getBoundingClientRect();
-            return {
-                x: e.touches[0].clientX - rect.left,
-                y: e.touches[0].clientY - rect.top
-            };
-        } else {
-            return { x: e.offsetX, y: e.offsetY };
-        }
+// Add QR code library
+const qrScript = document.createElement('script');
+qrScript.src = 'https://cdn.jsdelivr.net/npm/qrcode.js/lib/qrcode.min.js';
+document.head.appendChild(qrScript);
+
+// Replace the MAX_FILE_SIZE declaration with this
+const MAX_FILE_SIZE = {% if max_file_size %}{{ max_file_size }}{% else %}10485760{% endif %}; // Default to 10MB if not set
+
+function validateFileSize(dataUrl) {
+    // Estimate base64 size
+    const base64Length = dataUrl.length - (dataUrl.indexOf(',') + 1);
+    const fileSize = (base64Length * 3) / 4;
+    
+    if (fileSize > MAX_FILE_SIZE) {
+        alert('File size too large. Maximum size is 10MB.');
+        return false;
     }
-    signatureSVG.addEventListener('mousedown', function(e) {
-        drawing = true;
-        const pt = getPoint(e);
-        lastPoint = pt;
-        pathData += `M${pt.x},${pt.y} `;
-        if (!pathElement) {
-            pathElement = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-            pathElement.setAttribute('stroke', 'black');
-            pathElement.setAttribute('stroke-width', '2');
-            pathElement.setAttribute('fill', 'none');
-            signatureSVG.appendChild(pathElement);
+    return true;
+}
+
+// Photo capture handling
+const mobilePhotoInput = document.getElementById('mobilePhotoInput');
+const capturedPhotoImg = document.getElementById('capturedPhotoImg');
+const photoPlaceholder = document.getElementById('photoPlaceholder');
+const takePhotoBtn = document.getElementById('takePhotoBtn');
+const retakePhotoBtn = document.getElementById('retakePhotoBtn');
+
+// Handle photo capture button
+takePhotoBtn.addEventListener('click', () => {
+    mobilePhotoInput.click();
+});
+
+// Handle file selection
+mobilePhotoInput.addEventListener('change', (e) => {
+    if (e.target.files && e.target.files[0]) {
+        const file = e.target.files[0];
+        
+        if (file.size > 10485760) { // 10MB limit
+            alert('Photo file size too large. Maximum size is 10MB.');
+            return;
         }
-    });
-    signatureSVG.addEventListener('mousemove', function(e) {
-        if (!drawing) return;
-        const pt = getPoint(e);
-        pathData += `L${pt.x},${pt.y} `;
-        if (pathElement) pathElement.setAttribute('d', pathData);
-        lastPoint = pt;
-    });
-    window.addEventListener('mouseup', function() {
-        drawing = false;
-        lastPoint = null;
-    });
-    // Touch events
-    signatureSVG.addEventListener('touchstart', function(e) {
-        drawing = true;
-        const pt = getPoint(e);
-        lastPoint = pt;
-        pathData += `M${pt.x},${pt.y} `;
-        if (!pathElement) {
-            pathElement = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-            pathElement.setAttribute('stroke', 'black');
-            pathElement.setAttribute('stroke-width', '2');
-            pathElement.setAttribute('fill', 'none');
-            signatureSVG.appendChild(pathElement);
-        }
-        e.preventDefault();
-    });
-    signatureSVG.addEventListener('touchmove', function(e) {
-        if (!drawing) return;
-        const pt = getPoint(e);
-        pathData += `L${pt.x},${pt.y} `;
-        if (pathElement) pathElement.setAttribute('d', pathData);
-        lastPoint = pt;
-        e.preventDefault();
-    });
-    window.addEventListener('touchend', function() {
-        drawing = false;
-        lastPoint = null;
-    });
-    clearSignaturePadBtn.onclick = function() {
-        pathData = '';
-        if (pathElement) {
-            signatureSVG.removeChild(pathElement);
-            pathElement = null;
-        }
-    };
-    // Convert SVG to PNG and store in hidden input before form submit
-    document.querySelector('form[method="post"]').addEventListener('submit', function(e) {
-        e.preventDefault(); // Prevent default form submission
-        const canvas = document.createElement('canvas');
-        canvas.width = 320;
-        canvas.height = 120;
-        const ctx = canvas.getContext('2d');
-        const svgData = new XMLSerializer().serializeToString(signatureSVG);
-        const img = new Image();
-        img.onload = function() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.drawImage(img, 0, 0);
-            fingerprintCanvasInput.value = canvas.toDataURL('image/png');
-            e.target.submit(); // Now submit the form
+        
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const photoData = e.target.result;
+            // Update preview
+            capturedPhotoImg.src = photoData;
+            capturedPhotoImg.style.display = 'block';
+            photoPlaceholder.style.display = 'none';
+            
+            // Store base64 data with fingerprint field name
+            document.getElementById('customerPhotoData').value = photoData;
+            
+            takePhotoBtn.style.display = 'none';
+            retakePhotoBtn.style.display = 'inline-block';
         };
-        img.src = 'data:image/svg+xml;base64,' + btoa(svgData);
+        reader.readAsDataURL(file);
+    }
+});
+
+// Add retake functionality
+retakePhotoBtn.addEventListener('click', () => {
+    capturedPhotoImg.style.display = 'none';
+    photoPlaceholder.style.display = 'block';
+    document.getElementById('customerPhotoData').value = '';
+    takePhotoBtn.style.display = 'inline-block';
+    retakePhotoBtn.style.display = 'none';
+    mobilePhotoInput.value = '';
+});
+
+// Signature capture handling
+const signaturePreview = document.getElementById('signaturePreview');
+const signaturePlaceholder = document.getElementById('signaturePlaceholder');
+const captureSignatureBtn = document.getElementById('captureSignatureBtn');
+const qrcodeDiv = document.getElementById('qrcode');
+const qrcodeContainer = document.getElementById('qrcodeContainer');
+const signatureData = document.getElementById('signatureData');
+
+
+// Handle signature capture button
+captureSignatureBtn.addEventListener('click', () => {
+    // Generate unique session ID
+    const sessionId = Math.random().toString(36).substring(2);
+    
+    // Create the signature URL
+    const signatureUrl = `${window.location.origin}/mobile-signature/${sessionId}/`;
+    
+    // Clear previous QR code
+    qrcodeDiv.innerHTML = '';
+    
+    // Generate new QR code
+    new QRCode(qrcodeDiv, {
+        text: signatureUrl,
+        width: 200,
+        height: 200,
+        colorDark: "#000000",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.H
     });
-    // Camera capture logic
-    const openCameraBtn = document.getElementById('openCameraBtn');
-    const signatureVideo = document.getElementById('signatureVideo');
-    const signatureCanvas = document.getElementById('signatureCanvas');
-    const captureSignatureBtn = document.getElementById('captureSignatureBtn');
-    const fingerprintCameraInput = document.getElementById('fingerprintCameraInput');
-    let stream;
-    openCameraBtn.onclick = async function() {
-        stream = await navigator.mediaDevices.getUserMedia({ video: true });
-        signatureVideo.srcObject = stream;
-        signatureVideo.style.display = 'block';
-        signatureCanvas.style.display = 'none';
-        captureSignatureBtn.style.display = 'inline-block';
-    };
-    captureSignatureBtn.onclick = function() {
-        signatureCanvas.getContext('2d').drawImage(signatureVideo, 0, 0, signatureCanvas.width, signatureCanvas.height);
-        signatureCanvas.style.display = 'block';
-        signatureVideo.style.display = 'none';
-        if (stream) {
-            stream.getTracks().forEach(track => track.stop());
-        }
-        // Store camera image in hidden input
-        fingerprintCameraInput.value = signatureCanvas.toDataURL('image/png');
-    };
+    
+    // Show QR code section
+    qrcodeContainer.style.display = 'block';
+    
+    // Also open in new window for testing
+    window.open(signatureUrl, 'signature', 'width=500,height=500');
+});
+
+// Listen for signature data from mobile page
+window.addEventListener('message', (event) => {
+    if (event.data.type === 'signature') {
+        // Set signature data
+        signatureData.value = event.data.data;
+        signaturePreview.src = event.data.data;
+        
+        // Update display
+        signaturePreview.style.display = 'block';
+        signaturePlaceholder.style.display = 'none';
+        qrcodeContainer.style.display = 'none';
+    }
+});
+
+// Initialize signature pad
+function initSignaturePad() {
+    // Clear previous signature
+    signaturePreview.src = '';
+    signatureData.value = '';
+}
+
+// Initialize on page load
+window.addEventListener('load', () => {
+    initSignaturePad();
+    signaturePreview.style.display = 'none';
+});
+
+// Form submission
+document.querySelector('form').addEventListener('submit', function(e) {
+    const photoData = document.getElementById('customerPhotoData').value;
+    if (!photoData) {
+        e.preventDefault();
+        alert('Please capture customer photo');
+        return;
+    }
+    
+    // Add debug logging
+    console.log('Photo data exists:', !!photoData);
+    console.log('Photo data starts with data:image:', photoData.startsWith('data:image'));
+    
+    // Form will submit normally if photo is present
+});
+
+// Replace or update the existing signature capture code
+document.getElementById('captureSignatureBtn').addEventListener('click', function() {
+    const width = 800;
+    const height = 600;
+    const left = (screen.width - width) / 2;
+    const top = (screen.height - height) / 2;
+    const signatureWindow = window.open(
+        '/mobile-signature/', 
+        'signature',
+        `width=${width},height=${height},left=${left},top=${top}`
+    );
+});
+
+// Add this event listener for receiving the signature
+window.addEventListener('message', function(event) {
+    if (event.data.type === 'signature') {
+        const signaturePreview = document.getElementById('signaturePreview');
+        const signaturePlaceholder = document.getElementById('signaturePlaceholder');
+        const signatureData = document.getElementById('signatureData');
+        
+        signaturePreview.src = event.data.data;
+        signaturePreview.style.display = 'block';
+        signaturePlaceholder.style.display = 'none';
+        signatureData.value = event.data.data;
+    }
+});
     </script>
 </body>
 </html>

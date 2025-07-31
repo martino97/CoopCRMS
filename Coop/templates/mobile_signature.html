@@ -1,0 +1,94 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Capture Signature</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body { margin: 0; padding: 20px; background: #f5f5f5; }
+        .capture-container {
+            max-width: 800px;
+            margin: 20px auto;
+            text-align: center;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        #signatureInput {
+            display: none;
+        }
+        .capture-button {
+            display: inline-block;
+            background: #007bff;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px;
+        }
+        #signaturePreview {
+            max-width: 100%;
+            margin: 20px auto;
+            display: none;
+            border: 2px solid #ddd;
+        }
+        .button-group {
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="capture-container">
+        <h2>Capture Signature</h2>
+        <div class="button-group">
+            <input type="file" id="signatureInput" accept="image/*">
+            <label for="signatureInput" class="capture-button">Choose Signature Photo</label>
+        </div>
+        <img id="signaturePreview" alt="Signature Preview">
+        <div class="button-group">
+            <button id="retakeBtn" class="capture-button" style="display: none;">Retake</button>
+            <button id="saveBtn" class="capture-button" style="display: none;">Save</button>
+        </div>
+    </div>
+
+    <script>
+        const signatureInput = document.getElementById('signatureInput');
+        const signaturePreview = document.getElementById('signaturePreview');
+        const retakeBtn = document.getElementById('retakeBtn');
+        const saveBtn = document.getElementById('saveBtn');
+
+        signatureInput.addEventListener('change', function(e) {
+            if (e.target.files && e.target.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    signaturePreview.src = e.target.result;
+                    signaturePreview.style.display = 'block';
+                    retakeBtn.style.display = 'inline-block';
+                    saveBtn.style.display = 'inline-block';
+                };
+                reader.readAsDataURL(e.target.files[0]);
+            }
+        });
+
+        retakeBtn.addEventListener('click', () => {
+            signatureInput.value = '';
+            signaturePreview.style.display = 'none';
+            retakeBtn.style.display = 'none';
+            saveBtn.style.display = 'none';
+            signatureInput.click();
+        });
+
+        saveBtn.addEventListener('click', () => {
+            if (window.opener) {
+                window.opener.postMessage({
+                    type: 'signature',
+                    data: signaturePreview.src
+                }, '*');
+                window.close();
+            }
+        });
+    </script>
+</body>
+</html>
