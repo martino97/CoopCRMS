@@ -35,6 +35,103 @@
     <link rel="shortcut icon" href="{% static 'images/favicon.png' %}">
     <link rel="apple-touch-icon-precomposed" href="{% static 'images/favicon.png' %}">
 
+    <style>
+        /* Enhanced mobile styles for officer signature */
+        @media (max-width: 768px) {
+            #officerSignatureModal .modal-content {
+                margin: 2% auto !important;
+                width: 98% !important;
+                max-width: none !important;
+                padding: 15px !important;
+            }
+            
+            .signature-preview {
+                height: 200px !important;
+            }
+            
+            .signature-controls .btn {
+                font-size: 14px;
+                padding: 8px 12px;
+                margin: 5px 2px;
+            }
+            
+            #officerSignatureModal h3 {
+                font-size: 18px;
+                margin-bottom: 10px;
+            }
+            
+            #officerSignatureModal p {
+                font-size: 14px;
+                margin-bottom: 15px;
+            }
+        }
+        
+        /* Button styling improvements */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+        
+        /* Signature preview enhancements */
+        .signature-preview {
+            transition: all 0.3s ease;
+            border: 2px dashed #ddd;
+        }
+        
+        .signature-preview:hover {
+            border-color: #007bff;
+        }
+        
+        .signature-preview img {
+            transition: all 0.3s ease;
+        }
+        
+        /* Loading animation */
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .icon-loading::before {
+            content: "⟳";
+            animation: spin 1s linear infinite;
+            display: inline-block;
+        }
+        
+        /* Signature zoom modal animations */
+        #signatureZoomModal {
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+        
+        #signatureZoomModal.show {
+            opacity: 1;
+        }
+        
+        /* Enhanced signature display */
+        .signature-display {
+            transition: transform 0.2s ease;
+        }
+        
+        .signature-display:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+    </style>
+
 </head>
 
 <body class="body">
@@ -871,9 +968,10 @@
     <li><div class="body-title">Card #</div></li>
     <li><div class="body-title">Type</div></li>
     <li><div class="body-title">Date</div></li>
+    <li><div class="body-title">Status</div></li>
     <li><div class="body-title">Photo</div></li>
     <li><div class="body-title">Signature</div></li>
-    <li><div class="body-title">Remarks</div></li>
+    <li><div class="body-title">Officer Signature</div></li>
 </ul>
 <div class="divider mb-14"></div>
 <ul class="flex flex-column gap10">
@@ -886,6 +984,11 @@
             <div class="body-text">{{ card.card_number }}</div>
             <div class="body-text">{{ card.request_type }}</div>
             <div class="body-text">{{ card.request_date|date:"Y-m-d" }}</div>
+            <div class="body-text">
+                <span class="badge badge-success" style="background-color: #28a745; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px;">
+                    {{ card.status|default:"Taken" }} ✓
+                </span>
+            </div>
             <div class="body-text">
                 {% if card.fingerprint %}
                     <img src="{{ card.fingerprint.url }}" 
@@ -900,12 +1003,20 @@
             </div>
             <div class="body-text">
                 {% if card.signature %}
-                    <img src="{{ card.signature.url }}" alt="Signature" style="height:30px;">
+                    <img src="{{ card.signature.url }}" alt="Customer Signature" style="height:80px;width:100px;padding:5px;cursor:pointer;object-fit:contain;background:transparent;display:block;margin:0 auto;" onclick="zoomSignature('{{ card.signature.url }}', 'Customer Signature - {{ card.customer_name }}')">
                 {% else %}
                     -
                 {% endif %}
             </div>
-            <div class="body-text">{{ card.remarks|default:"-" }}</div>
+            <div class="body-text">
+                {% if card.officer_signature %}
+                    <img src="{{ card.officer_signature.url }}" alt="Officer Signature" style="height:80px;width:100px;padding:5px;cursor:pointer;object-fit:contain;background:transparent;display:block;margin:0 auto;" onclick="zoomSignature('{{ card.officer_signature.url }}', 'Officer Signature - {{ card.dispatched_by }}')">
+                {% else %}
+                    <button class="btn btn-sm btn-outline-secondary" onclick="openOfficerSignatureModal({{ card.id }})" style="font-size: 10px; padding: 2px 6px;">
+                        Add Signature
+                    </button>
+                {% endif %}
+            </div>
         </div>
     </li>
     <li class="divider"></li>
@@ -967,6 +1078,290 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
+
+<!-- Officer Signature Modal -->
+<div id="officerSignatureModal" class="modal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4);">
+    <div class="modal-content" style="background-color: #fefefe; margin: 5% auto; padding: 20px; border: 1px solid #888; width: 95%; max-width: 500px; border-radius: 8px;">
+        <span class="close" onclick="closeOfficerSignatureModal()" style="color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer;">&times;</span>
+        <h3>Officer Signature - {{ request.user.username }}</h3>
+        <p>Please take a photo of your signature to confirm card dispatch:</p>
+        
+        <!-- Mobile Photo Capture for Signature -->
+        <div class="officer-signature-capture" style="text-align: center;">
+            <div class="signature-preview" style="width: 100%; height: 250px; background: #f9f9f9; border: 2px dashed #ccc; border-radius: 8px; margin: 15px 0; display: flex; align-items: center; justify-content: center; position: relative;">
+                <img id="officerSignaturePreview" alt="Officer Signature" style="display: none; width: 100%; height: 100%; object-fit: contain; border-radius: 6px;">
+                <div class="signature-placeholder" id="officerSignaturePlaceholder" style="text-align: center; color: #999;">
+                    <i class="icon-camera" style="font-size: 48px; display: block; margin-bottom: 10px;"></i>
+                    <p>Tap to capture your signature</p>
+                    <small>Use a white paper with black/blue pen</small>
+                </div>
+            </div>
+            
+            <div class="signature-controls" style="margin-top: 15px;">
+                <input type="file" id="officerSignatureInput" accept="image/*" capture="environment" style="display: none;">
+                <button onclick="captureOfficerSignature()" class="btn btn-primary" id="captureOfficerBtn" style="margin-right: 10px;">
+                    <i class="icon-camera"></i> Capture Signature
+                </button>
+                <button onclick="retakeOfficerSignature()" class="btn btn-secondary" id="retakeOfficerBtn" style="display: none; margin-right: 10px;">
+                    <i class="icon-refresh"></i> Retake
+                </button>
+                <button onclick="saveOfficerSignature()" class="btn btn-success" id="saveOfficerBtn" style="display: none;">
+                    <i class="icon-check"></i> Confirm & Save
+                </button>
+            </div>
+        </div>
+        
+        <input type="hidden" id="currentCardId" value="">
+        <input type="hidden" id="officerSignatureData" value="">
+    </div>
+</div>
+
+<script>
+let currentCardId = null;
+
+function openOfficerSignatureModal(cardId) {
+    currentCardId = cardId;
+    document.getElementById('currentCardId').value = cardId;
+    document.getElementById('officerSignatureModal').style.display = 'block';
+    
+    // Reset the modal state
+    resetOfficerSignatureModal();
+}
+
+function closeOfficerSignatureModal() {
+    document.getElementById('officerSignatureModal').style.display = 'none';
+    currentCardId = null;
+    resetOfficerSignatureModal();
+}
+
+function resetOfficerSignatureModal() {
+    document.getElementById('officerSignaturePreview').style.display = 'none';
+    document.getElementById('officerSignaturePlaceholder').style.display = 'block';
+    document.getElementById('captureOfficerBtn').style.display = 'inline-block';
+    document.getElementById('retakeOfficerBtn').style.display = 'none';
+    document.getElementById('saveOfficerBtn').style.display = 'none';
+    document.getElementById('officerSignatureData').value = '';
+    document.getElementById('officerSignatureInput').value = '';
+}
+
+function captureOfficerSignature() {
+    document.getElementById('officerSignatureInput').click();
+}
+
+function retakeOfficerSignature() {
+    resetOfficerSignatureModal();
+}
+
+// Signature zoom functionality
+function zoomSignature(imageUrl, title) {
+    // Create zoom modal if it doesn't exist
+    let zoomModal = document.getElementById('signatureZoomModal');
+    if (!zoomModal) {
+        zoomModal = document.createElement('div');
+        zoomModal.id = 'signatureZoomModal';
+        zoomModal.innerHTML = `
+            <div class="modal fade" id="signatureZoomModal" tabindex="-1" style="display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.9);">
+                <div class="modal-dialog modal-xl" style="max-width: 95%; margin: 1% auto; height: 95vh; display: flex; align-items: center;">
+                    <div class="modal-content" style="background: white; border-radius: 12px; padding: 25px; width: 100%; max-height: 95vh; display: flex; flex-direction: column;">
+                        <div class="modal-header" style="border-bottom: 2px solid #dee2e6; padding-bottom: 15px; margin-bottom: 20px; flex-shrink: 0;">
+                            <h3 class="modal-title" id="zoomModalTitle" style="margin: 0; color: #333; font-weight: bold;">Signature View</h3>
+                            <button type="button" class="close" onclick="closeSignatureZoom()" style="background: none; border: none; font-size: 32px; float: right; cursor: pointer; color: #666; padding: 0; line-height: 1;">&times;</button>
+                        </div>
+                        <div class="modal-body" style="text-align: center; flex-grow: 1; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+                            <img id="zoomedSignatureImage" style="max-width: 100%; max-height: 100%; border: 3px solid #007bff; padding: 15px; background: white; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); object-fit: contain;">
+                        </div>
+                        <div class="modal-footer" style="border-top: 2px solid #dee2e6; padding-top: 15px; margin-top: 20px; text-align: center; flex-shrink: 0;">
+                            <button type="button" class="btn btn-lg btn-secondary" onclick="closeSignatureZoom()" style="padding: 10px 30px; font-size: 16px;">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(zoomModal);
+    }
+    
+    // Set the image and title
+    document.getElementById('zoomModalTitle').textContent = title;
+    document.getElementById('zoomedSignatureImage').src = imageUrl;
+    
+    // Show the modal with smooth animation
+    const modal = document.getElementById('signatureZoomModal');
+    modal.style.display = 'block';
+    setTimeout(() => {
+        modal.style.opacity = '1';
+    }, 10);
+    
+    // Add keyboard support for closing
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeSignatureZoom();
+        }
+    });
+}
+
+function closeSignatureZoom() {
+    const zoomModal = document.getElementById('signatureZoomModal');
+    if (zoomModal) {
+        zoomModal.style.opacity = '0';
+        setTimeout(() => {
+            zoomModal.style.display = 'none';
+        }, 300);
+    }
+}
+
+// Handle file input change
+document.addEventListener('DOMContentLoaded', function() {
+    const officerSignatureInput = document.getElementById('officerSignatureInput');
+    if (officerSignatureInput) {
+        officerSignatureInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const img = new Image();
+                    img.onload = function() {
+                        // Process the image to create vector-like signature with transparent background
+                        const processedSignature = processSignatureToVector(img);
+                        
+                        // Display the processed signature
+                        document.getElementById('officerSignaturePreview').src = processedSignature;
+                        document.getElementById('officerSignaturePreview').style.display = 'block';
+                        document.getElementById('officerSignaturePlaceholder').style.display = 'none';
+                        
+                        // Store the processed signature data
+                        document.getElementById('officerSignatureData').value = processedSignature;
+                        
+                        // Update button visibility
+                        document.getElementById('captureOfficerBtn').style.display = 'none';
+                        document.getElementById('retakeOfficerBtn').style.display = 'inline-block';
+                        document.getElementById('saveOfficerBtn').style.display = 'inline-block';
+                    };
+                    img.src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+});
+
+function processSignatureToVector(img) {
+    // Create a canvas to process the image
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    
+    // Set canvas size to match image (don't force portrait here, let server handle it)
+    canvas.width = img.width;
+    canvas.height = img.height;
+    
+    // Draw the image on canvas
+    ctx.drawImage(img, 0, 0);
+    
+    // Get image data
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const data = imageData.data;
+    
+    // Process pixels to create transparent background while preserving signature colors
+    for (let i = 0; i < data.length; i += 4) {
+        const r = data[i];
+        const g = data[i + 1];
+        const b = data[i + 2];
+        
+        // Calculate brightness
+        const brightness = (r + g + b) / 3;
+        
+        // Remove light backgrounds, grayish areas, and very dark/black backgrounds
+        if (brightness > 150 || (r > 120 && g > 120 && b > 120) || brightness < 30) {
+            data[i + 3] = 0; // Set alpha to 0 (transparent)
+        } else {
+            // Keep signature marks - preserve original colors
+            if (brightness < 80) {
+                // Keep dark signature areas as they are
+                data[i + 3] = 255; // Full opacity for signature
+            } else {
+                // Medium tones - slightly enhance but keep original colors
+                data[i] = Math.max(0, r - 20);
+                data[i + 1] = Math.max(0, g - 20);
+                data[i + 2] = Math.max(0, b - 20);
+                data[i + 3] = 255;
+            }
+        }
+    }
+    
+    // Put the processed image data back
+    ctx.putImageData(imageData, 0, 0);
+    
+    // Apply smoothing for better quality
+    const smoothCanvas = document.createElement('canvas');
+    const smoothCtx = smoothCanvas.getContext('2d');
+    smoothCanvas.width = canvas.width;
+    smoothCanvas.height = canvas.height;
+    
+    // Enable image smoothing for better quality
+    smoothCtx.imageSmoothingEnabled = true;
+    smoothCtx.imageSmoothingQuality = 'high';
+    
+    // Draw the processed image with smoothing
+    smoothCtx.drawImage(canvas, 0, 0);
+    
+    // Return the data URL of the processed signature
+    return smoothCanvas.toDataURL('image/png');
+}
+
+function saveOfficerSignature() {
+    if (!currentCardId) {
+        alert('Error: No card selected');
+        return;
+    }
+    
+    const signatureData = document.getElementById('officerSignatureData').value;
+    if (!signatureData) {
+        alert('Please capture your signature first');
+        return;
+    }
+    
+    // Show loading state
+    document.getElementById('saveOfficerBtn').innerHTML = '<i class="icon-loading"></i> Saving...';
+    document.getElementById('saveOfficerBtn').disabled = true;
+    
+    // Send to server
+    fetch("{% url 'add_officer_signature' %}", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: `card_id=${currentCardId}&officer_signature_data=${encodeURIComponent(signatureData)}`
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Officer signature saved successfully!');
+            closeOfficerSignatureModal();
+            // Reload the page to show the updated signature
+            window.location.reload();
+        } else {
+            alert('Error saving signature: ' + data.error);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error saving signature');
+    })
+    .finally(() => {
+        // Reset button state
+        document.getElementById('saveOfficerBtn').innerHTML = '<i class="icon-check"></i> Confirm & Save';
+        document.getElementById('saveOfficerBtn').disabled = false;
+    });
+}
+
+// Close modal when clicking outside
+window.onclick = function(event) {
+    const modal = document.getElementById('officerSignatureModal');
+    if (event.target == modal) {
+        closeOfficerSignatureModal();
+    }
+}
+</script>
                             </div>
                             <!-- /main-content-wrap -->
                         </div>
@@ -993,7 +1388,59 @@ document.addEventListener('DOMContentLoaded', function() {
     <script src="{% static 'js/bootstrap.min.js' %}"></script>
     <script src="{% static 'js/bootstrap-select.min.js' %}"></script>
     <script src="{% static 'js/main.js' %}"></script>
+    <script>
+// Dynamic content switching functionality
+document.addEventListener('DOMContentLoaded', function() {
+    // Add content switching capability
+    window.showContent = function(contentId) {
+        // Hide all existing content sections if they exist
+        document.querySelectorAll('.content-section').forEach(section => {
+            section.style.display = 'none';
+        });
+        
+        // Show the target content section
+        const targetSection = document.getElementById(contentId);
+        if (targetSection) {
+            targetSection.style.display = 'block';
+        }
+        
+        // Update active navigation
+        document.querySelectorAll('.nav-link, .menu-item-button').forEach(link => {
+            link.classList.remove('active');
+        });
+        
+        // Find and activate the clicked navigation link
+        const clickedLink = event.target.closest('a');
+        if (clickedLink) {
+            clickedLink.classList.add('active');
+        }
+    };
+    
+    // Convert existing links to use dynamic content switching
+    document.querySelectorAll('a[href*=".html"]').forEach(link => {
+        const href = link.getAttribute('href');
+        if (href && href.includes('.html')) {
+            const contentId = href.replace('.html', '').replace('-', '_');
+            link.setAttribute('href', 'javascript:void(0);');
+            link.setAttribute('onclick', `showContent('${contentId}')`);
+            link.classList.add('nav-link');
+        }
+    });
+});
 
+// Add CSS for content sections
+const style = document.createElement('style');
+style.textContent = `
+    .content-section {
+        display: none;
+    }
+    .content-section.active,
+    .content-section:first-child {
+        display: block;
+    }
+`;
+document.head.appendChild(style);
+</script>
 </body>
 
 </html>

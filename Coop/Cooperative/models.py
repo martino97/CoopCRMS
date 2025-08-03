@@ -31,6 +31,15 @@ class ATMRegisterBook(models.Model):
     request_type = models.CharField(max_length=100)
     request_date = models.DateTimeField(auto_now_add=True)
     
+    # Status field with default value
+    STATUS_CHOICES = [
+        ('Taken', 'Taken ✓'),
+        ('Pending', 'Pending'),
+        ('Processing', 'Processing'),
+        ('Completed', 'Completed'),
+    ]
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Taken')
+    
     # Documents
     signature = models.ImageField(
         upload_to='signatures/', 
@@ -42,6 +51,15 @@ class ATMRegisterBook(models.Model):
         blank=True, 
         null=True,
         verbose_name='Customer Photo'  # This helps identify the field's purpose
+    )
+    
+    # Officer Information
+    dispatched_by = models.CharField(max_length=255, blank=True, null=True, help_text="Officer who dispatched the card")
+    officer_signature = models.ImageField(
+        upload_to='officer_signatures/',
+        blank=True,
+        null=True,
+        verbose_name='Officer Signature'
     )
     
     # Additional Information
