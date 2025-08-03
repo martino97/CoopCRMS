@@ -11,8 +11,8 @@ class CustomerVisitorBookForm(forms.ModelForm):
 class ATMRegisterBookForm(forms.ModelForm):
     # Define regex validators
     card_number_validator = RegexValidator(
-        regex=r'^4198\d{12}$',
-        message='Card number must start with 4198 followed by exactly 12 digits (e.g., 4198381008098990)'
+        regex=r'^4198[\s\-]?\d{4}[\s\-]?\d{4}[\s\-]?\d{4}$|^4198\d{12}$',
+        message='Card number must start with 4198 followed by 12 digits (e.g., 4198381008098990 or 4198 3810 0809 8990)'
     )
     
     account_number_validator = RegexValidator(
@@ -31,10 +31,10 @@ class ATMRegisterBookForm(forms.ModelForm):
         widget=forms.TextInput(attrs={
             'class': 'form-control',
             'placeholder': '4198381008098990',
-            'pattern': r'^4198\d{12}$',
-            'title': 'Card number must start with 4198 followed by exactly 12 digits'
+            'pattern': r'^4198[\s\-]?\d{4}[\s\-]?\d{4}[\s\-]?\d{4}$|^4198\d{12}$',
+            'title': 'Card number must start with 4198 followed by 12 digits'
         }),
-        help_text='Format: 4198XXXXXXXXXXXX (16 digits total)'
+        help_text='Format: 4198XXXXXXXXXXXX or 4198 XXXX XXXX XXXX (16 digits total)'
     )
     
     account_number = forms.CharField(

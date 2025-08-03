@@ -33,12 +33,13 @@ class ATMRegisterBook(models.Model):
     
     # Status field with default value
     STATUS_CHOICES = [
+        ('New', 'New'),
         ('Taken', 'Taken ✓'),
         ('Pending', 'Pending'),
         ('Processing', 'Processing'),
         ('Completed', 'Completed'),
     ]
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Taken')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='New')
     
     # Documents
     signature = models.ImageField(

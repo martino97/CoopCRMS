@@ -1,0 +1,1242 @@
+{% load static %}
+<!DOCTYPE html>
+<!--[if IE 8 ]><html class="ie" xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-US" lang="en-US"> <![endif]-->
+<!--[if (gte IE 9)|!(IE)]><!-->
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-US" lang="en-US">
+<!--<![endif]-->
+
+<head>
+    <!-- Basic Page Needs -->
+    <meta charset="utf-8">
+    <!--[if IE]><meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'><![endif]-->
+    <title>ATM Card Management - CoopBank Customer Relationship Management System</title>
+
+    <meta name="author" content="themesflat.com">
+
+    <!-- Mobile Specific Metas -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+    <!-- Theme Style -->
+    <link rel="stylesheet" type="text/css" href="{% static 'css/animate.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/animation.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap-select.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+
+    <!-- Font -->
+    <link rel="stylesheet" href="{% static 'font/fonts.css' %}">
+
+    <!-- Icon -->
+    <link rel="stylesheet" href="{% static 'icon/style.css' %}">
+
+    <!-- Favicon and Touch Icons  -->
+    <link rel="shortcut icon" href="{% static 'images/favicon.png' %}">
+    <link rel="apple-touch-icon-precomposed" href="{% static 'images/favicon.png' %}">{# Extra CSS Block #}
+    <style>
+        .atm-card {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            border-radius: 15px;
+            padding: 20px;
+            color: white;
+            font-family: 'Courier New', monospace;
+            position: relative;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            margin-bottom: 20px;
+            min-height: 200px;
+        }
+
+        .bank-logo {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .card-number {
+            font-size: 22px;
+            letter-spacing: 4px;
+            margin: 40px 0 20px 0;
+            font-weight: bold;
+        }
+
+        .card-holder-name {
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .card-validity {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .scan-btn {
+            background: linear-gradient(45deg, #007bff, #0056b3);
+            border: none;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(0,123,255,0.3);
+            transition: all 0.3s ease;
+        }
+
+        .scan-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,123,255,0.4);
+            color: white;
+        }
+
+        .camera-preview {
+            width: 100%;
+            max-width: 400px;
+            height: 300px;
+            background: #f8f9fa;
+            border: 2px dashed #dee2e6;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 20px auto;
+        }
+
+        .modal-body {
+            padding: 30px;
+        }
+
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .step {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 10px;
+            font-weight: bold;
+            position: relative;
+        }
+
+        .step.active {
+            background: #007bff;
+            color: white;
+        }
+
+        .step.completed {
+            background: #28a745;
+            color: white;
+        }
+
+        .step:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 100%;
+            width: 30px;
+            height: 2px;
+            background: #e9ecef;
+            transform: translateY(-50%);
+        }
+
+        .step.completed:not(:last-child)::after {
+            background: #28a745;
+        }
+
+        @media (max-width: 768px) {
+            .modal-dialog {
+                margin: 10px;
+                max-width: none;
+                width: calc(100% - 20px);
+            }
+            
+            .atm-card {
+                margin: 10px 0;
+            }
+            
+            .card-number {
+                font-size: 18px;
+                letter-spacing: 2px;
+            }
+
+            #scanModal .modal-content {
+                margin: 2% auto !important;
+                width: 98% !important;
+                max-width: none !important;
+                padding: 15px !important;
+            }
+            
+            .camera-preview {
+                height: 200px !important;
+            }
+            
+            .camera-controls .btn {
+                font-size: 14px;
+                padding: 8px 12px;
+                margin: 5px 2px;
+            }
+        }
+
+        /* New Cards Table Styles */
+        .table-all-user .table {
+            margin-bottom: 0;
+        }
+
+        .table-all-user .table th {
+            background-color: #f8f9fa;
+            border-bottom: 2px solid #dee2e6;
+            font-weight: 600;
+            padding: 15px 12px;
+            font-size: 14px;
+            color: #495057;
+        }
+
+        .table-all-user .table td {
+            padding: 15px 12px;
+            vertical-align: middle;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .block-pending {
+            background: #fff3cd;
+            color: #856404;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            display: inline-block;
+        }
+
+        .block-new {
+            background: #d4edda;
+            color: #155724;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            display: inline-block;
+        }
+
+        .block-available {
+            background: #d1ecf1;
+            color: #0c5460;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            display: inline-block;
+        }
+
+        .list-icon-function {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .list-icon-function .item {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .list-icon-function .item.eye {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .list-icon-function .item.edit {
+            background: #f3e5f5;
+            color: #7b1fa2;
+        }
+
+        .list-icon-function .item.trash {
+            background: #ffebee;
+            color: #d32f2f;
+        }
+
+        .list-icon-function .item:hover {
+            transform: scale(1.1);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+
+        #downloadCSVBtn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+
+<body class="body">
+    <!-- preload -->
+    <div class="preload preload-container">
+        <div class="preload-logo">
+            <div class="spinner"></div>
+        </div>
+    </div>
+    <!-- /preload -->
+    
+    <div id="wrapper">
+        <div id="page" class="">
+            <div class="layout-wrap">
+                <!-- section-menu-left -->
+                <div class="section-menu-left">
+                    <div class="box-logo">
+                        <a href="{% url 'dashboard' %}" id="site-logo-inner">
+                            <img class="" id="logo_header" alt="CoopLogo"
+                                 src="{% static 'images/CoopLogo.png' %}"
+                                 data-light="{% static 'images/CoopLogo.png' %}"
+                                 data-dark="{% static 'images/CoopLogo.png' %}"
+                                 style="max-width:180px; height:auto; display:block; margin:0 auto 16px;">
+                        </a>
+                        <div class="button-show-hide">
+                            <i class="icon-menu-left"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="section-menu-left-wrap">
+                        <div class="center">
+                            <div class="center-item">
+                                <div class="center-heading">Main Home</div>
+                                <ul class="menu-list">
+                                    <li class="menu-item has-children active">
+                                        <a href="javascript:void(0);" class="menu-item-button">
+                                            <div class="icon"><i class="icon-grid"></i></div>
+                                            <div class="text">Dashboard</div>
+                                        </a>
+                                        <ul class="sub-menu" style="display: block;">
+                                            <li class="sub-menu-item">
+                                                <a href="{% url 'add_atm_card' %}" class="active">
+                                                    <div class="text">Add New ATM Card</div>
+                                                </a>
+                                            </li>
+                                            <li class="sub-menu-item">
+                                                <a href="{% url 'dashboard' %}" class="">
+                                                    <div class="text">Dashboard</div>
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </div>
+                            
+                            <div class="center-item">
+                                <div class="center-heading">All page</div>
+                                <ul class="menu-list">
+                                    <li class="menu-item">
+                                        <a href="{% url 'add_customer' %}" class="">
+                                            <div class="icon"><i class="icon-user-plus"></i></div>
+                                            <div class="text">Add Customer</div>
+                                        </a>
+                                    </li>
+                                    <li class="menu-item">
+                                        <a href="#" class="">
+                                            <div class="icon"><i class="icon-help-circle"></i></div>
+                                            <div class="text">Help center</div>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                            
+                            <div class="center-item">
+                                <div class="center-heading">Connect us</div>
+                                <ul class="wg-social">
+                                    <li>
+                                        <a href="#"><i class="icon-facebook"></i></a>
+                                    </li>
+                                    <li class="active">
+                                        <a href="#"><i class="icon-twitter"></i></a>
+                                    </li>
+                                    <li>
+                                        <a href="#"><i class="icon-linkedin"></i></a>
+                                    </li>
+                                    <li>
+                                        <a href="#"><i class="icon-instagram"></i></a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- /section-menu-left -->
+                
+                <!-- section-content-right -->
+                <div class="section-content-right">
+                    <!-- header-dashboard -->
+                    <div class="header-dashboard">
+                        <div class="wrap">
+                            <div class="header-left">
+                                <a href="{% url 'dashboard' %}">
+                                    <img class="" id="logo_header_mobile" alt="CoopLogo" 
+                                         src="{% static 'images/CoopLogo.png' %}" 
+                                         data-light="{% static 'images/CoopLogo.png' %}" 
+                                         data-dark="{% static 'images/CoopLogo.png' %}" 
+                                         style="max-width:154px; height:auto; display:block;">
+                                </a>
+                                <div class="button-show-hide">
+                                    <i class="icon-menu-left"></i>
+                                </div>
+                                <form class="form-search flex-grow">
+                                    <fieldset class="name">
+                                        <input type="text" placeholder="Search here..." class="show-search" name="name" tabindex="2" value="" aria-required="true" required="">
+                                    </fieldset>
+                                    <div class="button-submit">
+                                        <button class="" type="submit"><i class="icon-search"></i></button>
+                                    </div>
+                                </form>
+                            </div>
+                            
+                            <div class="header-grid">
+                                <div class="header-item button-dark-light">
+                                    <i class="icon-moon"></i>
+                                </div>
+                                
+                                <div class="popup-wrap user type-header">
+                                    <div class="dropdown">
+                                        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton3" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <span class="header-user wg-user">
+                                                <span class="image">
+                                                    <img src="{% static 'images/avatar/user-1.png' %}" alt="">
+                                                </span>
+                                                <span class="flex flex-column">
+                                                    <span class="body-title mb-2">{{ user.username|default:"Admin" }}</span>
+                                                    <span class="text-tiny">Admin</span>
+                                                </span>
+                                            </span>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-end has-content" aria-labelledby="dropdownMenuButton3">
+                                            <li>
+                                                <a href="#" class="user-item">
+                                                    <div class="icon">
+                                                        <i class="icon-user"></i>
+                                                    </div>
+                                                    <div class="body-title-2">Account</div>
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a href="{% url 'logout' %}" class="user-item">
+                                                    <div class="icon">
+                                                        <i class="icon-log-out"></i>
+                                                    </div>
+                                                    <div class="body-title-2">Log out</div>
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /header-dashboard -->
+                    
+                    <!-- main-content -->
+                    <div class="main-content">
+                        <div class="main-content-inner">
+                            <div class="main-content-wrap">
+                                <div class="tf-section-2 mb-30">
+                                    <!-- Breadcrumb -->
+                                    <div class="flex gap20 flex-wrap-mobile">
+                                        <div class="w-half">
+                                            <div class="wg-box">
+                                                <div class="flex items-center justify-between">
+                                                    <div class="flex items-center gap10">
+                                                        <a href="{% url 'dashboard' %}" class="body-text">Dashboard</a>
+                                                        <i class="icon-chevron-right"></i>
+                                                        <div class="body-text">ATM Card Management</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="tf-section">
+                                    <div class="wg-box">
+                                        <div class="flex items-center justify-between mb-30">
+                                            <h5>ATM Card Management</h5>
+                                            <a href="{% url 'dashboard' %}" class="tf-button style-1 w208">
+                                                <i class="icon-arrow-left"></i>
+                                                Back to Dashboard
+                                            </a>
+                                        </div>
+
+                                        <!-- ATM Card Preview -->
+                                        <div class="wg-table">
+                                            <div class="flex gap20 flex-wrap-mobile">
+                                                <div class="w-half">
+                                                    <div class="atm-card">
+                                                        <div class="bank-logo">COOP BANK</div>
+                                                        <div class="card-number" id="displayCardNumber">
+                                                            {% if card_data.card_number %}
+                                                                {{ card_data.card_number }}
+                                                            {% else %}
+                                                                4198 **** **** ****
+                                                            {% endif %}
+                                                        </div>
+                                                        <div class="card-holder-name" id="displayCardHolder">
+                                                            {% if card_data.customer_name %}
+                                                                {{ card_data.customer_name }}
+                                                            {% else %}
+                                                                CARD HOLDER NAME
+                                                            {% endif %}
+                                                        </div>
+                                                        <div class="card-validity">
+                                                            VALID THRU 
+                                                            <span id="displayExpiry">
+                                                                {% if card_data.expiry_date %}
+                                                                    {{ card_data.expiry_date }}
+                                                                {% else %}
+                                                                    MM/YY
+                                                                {% endif %}
+                                                            </span>
+                                                        </div>
+                                                        <div style="position: absolute; bottom: 15px; right: 20px; font-size: 12px; opacity: 0.8;">
+                                                            Account: <span id="displayAccount">
+                                                                {% if card_data.account_number %}
+                                                                    {{ card_data.account_number }}
+                                                                {% else %}
+                                                                    01S**********
+                                                                {% endif %}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="w-half">
+                                                    <div class="flex flex-column justify-content-center h-100">
+                                                        <button class="scan-btn tf-button style-1 w-full mb-20" onclick="openScanModal()">
+                                                            <i class="icon-camera"></i>
+                                                            Scan New ATM Card
+                                                        </button>
+                                                        <div class="text-center">
+                                                            <p class="text-tiny">
+                                                                Use your mobile camera to scan the ATM card and automatically extract the details.
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- New ATM Cards Table Section -->
+                                <div class="tf-section mt-30">
+                                    <div class="wg-box">
+                                        <div class="flex items-center justify-between mb-30">
+                                            <h5>Recently Added ATM Cards</h5>
+                                            <button class="tf-button style-1" onclick="downloadCSV()" id="downloadCSVBtn">
+                                                <i class="icon-download"></i>
+                                                Download CSV Report
+                                            </button>
+                                        </div>
+
+                                        <div class="wg-table table-all-user">
+                                            <div class="table-responsive">
+                                                <table class="table table-striped table-bordered">
+                                                    <thead>
+                                                        <tr>
+                                                            <th style="width: 80px">#</th>
+                                                            <th>Name</th>
+                                                            <th>Phone</th>
+                                                            <th>Account #</th>
+                                                            <th>Card #</th>
+                                                            <th>Type</th>
+                                                            <th>Date</th>
+                                                            <th>Status</th>
+                                                            <th>Photo</th>
+                                                            <th>Action</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody id="newCardsTableBody">
+                                                        {% if new_cards %}
+                                                            {% for card in new_cards %}
+                                                            <tr>
+                                                                <td>{{ forloop.counter }}</td>
+                                                                <td>
+                                                                    <div class="body-title">{{ card.customer_name }}</div>
+                                                                </td>
+                                                                <td>{{ card.customer_phone|default:"N/A" }}</td>
+                                                                <td>
+                                                                    <div class="body-text">{{ card.account_number }}</div>
+                                                                </td>
+                                                                <td>
+                                                                    <div class="body-text">{{ card.card_number|slice:":4" }} **** **** {{ card.card_number|slice:"-4:" }}</div>
+                                                                </td>
+                                                                <td>
+                                                                    <div class="block-available">{{ card.request_type|title }}</div>
+                                                                </td>
+                                                                <td>{{ card.request_date|date:"Y-m-d" }}</td>
+                                                                <td>
+                                                                    <div class="block-new">{{ card.status|default:"New" }}</div>
+                                                                </td>
+                                                                <td>
+                                                                    <div class="image">
+                                                                        {% if card.fingerprint %}
+                                                                            <img src="{{ card.fingerprint.url }}" alt="Photo" style="width:32px;height:32px;border-radius:50%;object-fit:cover;">
+                                                                        {% else %}
+                                                                            <i class="icon-camera text-success"></i>
+                                                                        {% endif %}
+                                                                    </div>
+                                                                </td>
+                                                                <td>
+                                                                    <div class="list-icon-function">
+                                                                        <div class="item eye">
+                                                                            <i class="icon-eye"></i>
+                                                                        </div>
+                                                                        <div class="item edit">
+                                                                            <i class="icon-edit-3"></i>
+                                                                        </div>
+                                                                        <div class="item trash">
+                                                                            <i class="icon-trash-2" onclick="removeCardFromDB('{{ card.id }}')"></i>
+                                                                        </div>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                            {% endfor %}
+                                                        {% else %}
+                                                            <tr id="emptyState">
+                                                                <td colspan="10" class="text-center text-muted">
+                                                                    <i class="icon-credit-card" style="font-size: 48px; opacity: 0.3; margin-bottom: 10px; display: block;"></i>
+                                                                    No ATM cards added yet. Use the scanner above to add new cards.
+                                                                </td>
+                                                            </tr>
+                                                        {% endif %}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+
+                                        <!-- CSV Download Progress -->
+                                        <div id="downloadProgress" class="alert alert-info mt-20" style="display: none;">
+                                            <div class="flex items-center gap10">
+                                                <div class="spinner-border spinner-border-sm" role="status"></div>
+                                                <span>Preparing CSV download...</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /main-content -->
+                </div>
+                <!-- /section-content-right -->
+            </div>
+        </div>
+    </div>
+
+<!-- Card Scanning Modal -->
+<div class="modal fade" id="scanModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title body-title">Scan ATM Card</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                {% csrf_token %}
+                
+                <!-- Step Indicator -->
+                <div class="step-indicator">
+                    <div class="step active" id="step1">1</div>
+                    <div class="step" id="step2">2</div>
+                    <div class="step" id="step3">3</div>
+                </div>
+
+                <!-- Step 1: Camera Capture -->
+                <div id="cameraStep" class="text-center">
+                    <h6 class="body-title mb-20">Step 1: Capture Card Image</h6>
+                    <div class="camera-preview" id="cameraPreview">
+                        <video id="cameraVideo" autoplay playsinline style="display: none; width: 100%; height: 100%; object-fit: cover; border-radius: 8px;"></video>
+                        <div id="cameraPlaceholder">
+                            <div>
+                                <i class="icon-camera" style="font-size: 48px; color: #6c757d; margin-bottom: 10px;"></i>
+                                <p class="text-tiny">Click "Start Camera" to begin</p>
+                            </div>
+                        </div>
+                        <canvas id="captureCanvas" style="display: none;"></canvas>
+                    </div>
+                    <div class="camera-controls">
+                        <button type="button" class="tf-button style-1" id="startCamera">Start Camera</button>
+                        <button type="button" class="tf-button style-1" id="captureBtn" style="display: none;">Capture Card</button>
+                        <button type="button" class="tf-button style-2" id="retakeBtn" style="display: none;">Retake</button>
+                    </div>
+                </div>
+
+                <!-- Step 2: Processing -->
+                <div id="processingStep" style="display: none;" class="text-center">
+                    <h6 class="body-title mb-20">Step 2: Processing Card Details</h6>
+                    <div class="spinner-border text-primary mb-20" role="status">
+                        <span class="visually-hidden">Processing...</span>
+                    </div>
+                    <p class="text-tiny">Extracting card information...</p>
+                </div>
+
+                <!-- Step 3: Form Completion -->
+                <div id="formStep" style="display: none;">
+                    <h6 class="body-title mb-20">Step 3: Complete Card Information</h6>
+                    <form id="cardForm">
+                        <div class="flex gap20 flex-wrap-mobile">
+                            <div class="w-half">
+                                <fieldset class="name">
+                                    <div class="body-title pb-3">Card Number</div>
+                                    <input class="flex-grow" type="text" id="cardNumber" readonly>
+                                </fieldset>
+                            </div>
+                            <div class="w-half">
+                                <fieldset class="name">
+                                    <div class="body-title pb-3">Account Number</div>
+                                    <input class="flex-grow" type="text" id="accountNumber" readonly>
+                                </fieldset>
+                            </div>
+                        </div>
+                        <div class="flex gap20 flex-wrap-mobile">
+                            <div class="w-half">
+                                <fieldset class="name">
+                                    <div class="body-title pb-3">Card Holder Name</div>
+                                    <input class="flex-grow" type="text" id="cardHolderName" readonly>
+                                </fieldset>
+                            </div>
+                            <div class="w-half">
+                                <fieldset class="name">
+                                    <div class="body-title pb-3">Expiry Date</div>
+                                    <input class="flex-grow" type="text" id="expiryDate" readonly>
+                                </fieldset>
+                            </div>
+                        </div>
+                        <div class="flex gap20 flex-wrap-mobile">
+                            <div class="w-half">
+                                <fieldset class="name">
+                                    <div class="body-title pb-3">Phone Number <span class="text-danger">*</span></div>
+                                    <input class="flex-grow" type="tel" id="phoneNumber" placeholder="Enter phone number" required>
+                                </fieldset>
+                            </div>
+                            <div class="w-half">
+                                <fieldset class="category">
+                                    <div class="body-title pb-3">Request Type</div>
+                                    <div class="select">
+                                        <select id="requestType">
+                                            <option value="new">New Card</option>
+                                            <option value="replacement">Replacement</option>
+                                            <option value="renewal">Renewal</option>
+                                        </select>
+                                    </div>
+                                </fieldset>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="tf-button style-2" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="tf-button style-1" onclick="processCardScan()" id="processBtn" style="display: none;">Process Card</button>
+                <button type="button" class="tf-button style-1" onclick="saveCardDetails()" id="saveBtn" style="display: none;">Save Card Details</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Scripts -->
+<script src="{% static 'js/jquery.min.js' %}"></script>
+<script src="{% static 'js/bootstrap.min.js' %}"></script>
+<script src="{% static 'js/bootstrap-select.min.js' %}"></script>
+<script src="{% static 'js/main.js' %}"></script>
+
+<script>
+    let cameraStream = null;
+    let capturedImageData = null;
+
+    function openScanModal() {
+        const modal = new bootstrap.Modal(document.getElementById('scanModal'));
+        modal.show();
+        resetModal();
+    }
+
+    function resetModal() {
+        // Reset steps
+        document.getElementById('step1').className = 'step active';
+        document.getElementById('step2').className = 'step';
+        document.getElementById('step3').className = 'step';
+        
+        // Show camera step
+        document.getElementById('cameraStep').style.display = 'block';
+        document.getElementById('processingStep').style.display = 'none';
+        document.getElementById('formStep').style.display = 'none';
+        
+        // Reset buttons
+        document.getElementById('processBtn').style.display = 'none';
+        document.getElementById('saveBtn').style.display = 'none';
+        
+        // Stop camera if active
+        if (cameraStream) {
+            cameraStream.getTracks().forEach(track => track.stop());
+            cameraStream = null;
+        }
+    }
+
+    // Camera handling
+    document.getElementById('startCamera').addEventListener('click', async function() {
+        try {
+            cameraStream = await navigator.mediaDevices.getUserMedia({ 
+                video: { facingMode: 'environment' } 
+            });
+            
+            const video = document.getElementById('cameraVideo');
+            const placeholder = document.getElementById('cameraPlaceholder');
+            
+            video.srcObject = cameraStream;
+            video.style.display = 'block';
+            placeholder.style.display = 'none';
+            
+            this.style.display = 'none';
+            document.getElementById('captureBtn').style.display = 'inline-block';
+        } catch (error) {
+            console.error('Camera error:', error);
+            alert('Could not access camera. Please check permissions.');
+        }
+    });
+
+    document.getElementById('captureBtn').addEventListener('click', function() {
+        const video = document.getElementById('cameraVideo');
+        const canvas = document.getElementById('captureCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Set canvas size to video size
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        
+        // Draw current video frame to canvas
+        ctx.drawImage(video, 0, 0);
+        
+        // Get image data
+        capturedImageData = canvas.toDataURL('image/png');
+        
+        // Stop camera
+        if (cameraStream) {
+            cameraStream.getTracks().forEach(track => track.stop());
+            cameraStream = null;
+        }
+        
+        // Show captured image
+        video.style.display = 'none';
+        canvas.style.display = 'block';
+        
+        // Update buttons
+        this.style.display = 'none';
+        document.getElementById('retakeBtn').style.display = 'inline-block';
+        document.getElementById('processBtn').style.display = 'inline-block';
+    });
+
+    document.getElementById('retakeBtn').addEventListener('click', function() {
+        const video = document.getElementById('cameraVideo');
+        const canvas = document.getElementById('captureCanvas');
+        const placeholder = document.getElementById('cameraPlaceholder');
+        
+        // Reset display
+        video.style.display = 'none';
+        canvas.style.display = 'none';
+        placeholder.style.display = 'flex';
+        
+        // Reset buttons
+        document.getElementById('startCamera').style.display = 'inline-block';
+        this.style.display = 'none';
+        document.getElementById('captureBtn').style.display = 'none';
+        document.getElementById('processBtn').style.display = 'none';
+        
+        capturedImageData = null;
+    });
+
+    function processCardScan() {
+        if (!capturedImageData) {
+            alert('Please capture a card image first');
+            return;
+        }
+        
+        // Move to processing step
+        document.getElementById('step1').className = 'step completed';
+        document.getElementById('step2').className = 'step active';
+        document.getElementById('cameraStep').style.display = 'none';
+        document.getElementById('processingStep').style.display = 'block';
+        document.getElementById('processBtn').style.display = 'none';
+        
+        // Send to backend for processing
+        fetch("{% url 'process_card_scan' %}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({
+                image_data: capturedImageData
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Populate form with extracted data
+                document.getElementById('cardNumber').value = data.card_number || '';
+                document.getElementById('accountNumber').value = data.account_number || '';
+                document.getElementById('cardHolderName').value = data.card_holder_name || '';
+                document.getElementById('expiryDate').value = data.expiry_date || '';
+                
+                // Move to form step
+                document.getElementById('step2').className = 'step completed';
+                document.getElementById('step3').className = 'step active';
+                document.getElementById('processingStep').style.display = 'none';
+                document.getElementById('formStep').style.display = 'block';
+                document.getElementById('saveBtn').style.display = 'inline-block';
+            } else {
+                alert('Error processing card: ' + (data.error || 'Unknown error'));
+                resetModal();
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error processing card. Please try again.');
+            resetModal();
+        });
+    }
+
+    function saveCardDetails() {
+        const formData = {
+            card_number: document.getElementById('cardNumber').value,
+            account_number: document.getElementById('accountNumber').value,
+            customer_name: document.getElementById('cardHolderName').value,
+            customer_phone: document.getElementById('phoneNumber').value,
+            request_type: document.getElementById('requestType').value,
+            image_data: capturedImageData
+        };
+        
+        // Validate required fields
+        if (!formData.customer_phone) {
+            alert('Please enter phone number');
+            return;
+        }
+        
+        // Show loading state
+        const saveBtn = document.getElementById('saveBtn');
+        saveBtn.textContent = 'Saving...';
+        saveBtn.disabled = true;
+        
+        // Save to backend
+        fetch("{% url 'add_customer' %}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify(formData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Card details saved successfully!');
+                // Update card preview
+                updateCardPreview(formData);
+                // Add to new cards table
+                addCardToTable(formData);
+                // Close modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('scanModal'));
+                modal.hide();
+            } else {
+                alert('Error saving card details: ' + (data.error || 'Unknown error'));
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error saving card details. Please try again.');
+        })
+        .finally(() => {
+            // Restore button state
+            saveBtn.textContent = 'Save Card Details';
+            saveBtn.disabled = false;
+        });
+    }
+
+    function updateCardPreview(data) {
+        if (data.card_number) {
+            document.getElementById('displayCardNumber').textContent = data.card_number;
+        }
+        if (data.customer_name) {
+            document.getElementById('displayCardHolder').textContent = data.customer_name.toUpperCase();
+        }
+        if (data.account_number) {
+            document.getElementById('displayAccount').textContent = data.account_number;
+        }
+    }
+
+    // Store new cards data - will be populated from DOM on page load
+    let newCardsData = [];
+
+    // Initialize from existing table data
+    function initializeCardsData() {
+        const tableRows = document.querySelectorAll('#newCardsTableBody tr:not(#emptyState)');
+        newCardsData = [];
+        
+        tableRows.forEach((row, index) => {
+            const cells = row.children;
+            if (cells.length >= 9) {
+                newCardsData.push({
+                    id: Date.now() + index,
+                    name: cells[1].textContent.trim(),
+                    phone: cells[2].textContent.trim(),
+                    account_number: cells[3].textContent.trim(),
+                    card_number: cells[4].textContent.trim(),
+                    request_type: cells[5].textContent.trim(),
+                    date: cells[6].textContent.trim(),
+                    status: cells[7].textContent.trim(),
+                    photo: cells[8].querySelector('img') ? 'Available' : 'N/A'
+                });
+            }
+        });
+    }
+
+    function addCardToTable(cardData) {
+        // Remove empty state if it exists
+        const emptyState = document.getElementById('emptyState');
+        if (emptyState) {
+            emptyState.remove();
+        }
+
+        // Add to data array with a unique temporary ID
+        const cardEntry = {
+            id: Date.now(), // Temporary ID for new cards
+            name: cardData.customer_name || 'N/A',
+            phone: cardData.customer_phone || 'N/A',
+            account_number: cardData.account_number || 'N/A',
+            card_number: cardData.card_number || 'N/A',
+            request_type: cardData.request_type || 'New Card Request',
+            date: new Date().toISOString().split('T')[0],
+            status: 'New',
+            photo: 'Available',
+            database_id: null // New cards don't have database ID yet
+        };
+        
+        newCardsData.push(cardEntry);
+
+        // Add to table
+        const tableBody = document.getElementById('newCardsTableBody');
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${newCardsData.length}</td>
+            <td>
+                <div class="body-title">${cardEntry.name}</div>
+            </td>
+            <td>${cardEntry.phone}</td>
+            <td>
+                <div class="body-text">${cardEntry.account_number}</div>
+            </td>
+            <td>
+                <div class="body-text">${formatCardNumber(cardEntry.card_number)}</div>
+            </td>
+            <td>
+                <div class="block-available">${cardEntry.request_type}</div>
+            </td>
+            <td>${cardEntry.date}</td>
+            <td>
+                <div class="block-new">${cardEntry.status}</div>
+            </td>
+            <td>
+                <div class="image">
+                    <i class="icon-camera text-success"></i>
+                </div>
+            </td>
+            <td>
+                <div class="list-icon-function">
+                    <div class="item eye">
+                        <i class="icon-eye"></i>
+                    </div>
+                    <div class="item edit">
+                        <i class="icon-edit-3"></i>
+                    </div>
+                    <div class="item trash">
+                        <i class="icon-trash-2" onclick="removeCard(${cardEntry.id})"></i>
+                    </div>
+                </div>
+            </td>
+        `;
+        
+        tableBody.appendChild(row);
+        
+        // Enable download button if there's data
+        document.getElementById('downloadCSVBtn').disabled = false;
+    }
+
+    function formatCardNumber(cardNumber) {
+        if (!cardNumber || cardNumber === 'N/A') return cardNumber;
+        // Format as 4198 **** **** 1234 (show first 4 and last 4 digits)
+        const cleaned = cardNumber.replace(/\s/g, '');
+        if (cleaned.length >= 8) {
+            return cleaned.substring(0, 4) + ' **** **** ' + cleaned.substring(cleaned.length - 4);
+        }
+        return cardNumber;
+    }
+
+    function removeCard(cardId) {
+        if (confirm('Are you sure you want to remove this card entry?')) {
+            // Remove from data array
+            newCardsData = newCardsData.filter(card => card.id !== cardId);
+            
+            // Rebuild table
+            rebuildTable();
+        }
+    }
+
+    function removeCardFromDB(cardId) {
+        if (confirm('Are you sure you want to permanently delete this card from the database?')) {
+            // Send delete request to server
+            fetch(`/delete_atm_card/${cardId}/`, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Reload the page to reflect changes
+                    location.reload();
+                } else {
+                    alert('Error deleting card: ' + (data.error || 'Unknown error'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error deleting card. Please try again.');
+            });
+        }
+    }
+
+    function rebuildTable() {
+        const tableBody = document.getElementById('newCardsTableBody');
+        tableBody.innerHTML = '';
+        
+        if (newCardsData.length === 0) {
+            tableBody.innerHTML = `
+                <tr id="emptyState">
+                    <td colspan="10" class="text-center text-muted">
+                        <i class="icon-credit-card" style="font-size: 48px; opacity: 0.3; margin-bottom: 10px; display: block;"></i>
+                        No ATM cards added yet. Use the scanner above to add new cards.
+                    </td>
+                </tr>
+            `;
+            document.getElementById('downloadCSVBtn').disabled = true;
+        } else {
+            newCardsData.forEach((cardEntry, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>
+                        <div class="body-title">${cardEntry.name}</div>
+                    </td>
+                    <td>${cardEntry.phone}</td>
+                    <td>
+                        <div class="body-text">${cardEntry.account_number}</div>
+                    </td>
+                    <td>
+                        <div class="body-text">${formatCardNumber(cardEntry.card_number)}</div>
+                    </td>
+                    <td>
+                        <div class="block-available">${cardEntry.request_type}</div>
+                    </td>
+                    <td>${cardEntry.date}</td>
+                    <td>
+                        <div class="block-new">${cardEntry.status}</div>
+                    </td>
+                    <td>
+                        <div class="image">
+                            <i class="icon-camera text-success"></i>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="list-icon-function">
+                            <div class="item eye">
+                                <i class="icon-eye"></i>
+                            </div>
+                            <div class="item edit">
+                                <i class="icon-edit-3"></i>
+                            </div>
+                            <div class="item trash">
+                                <i class="icon-trash-2" onclick="removeCard(${cardEntry.id})"></i>
+                            </div>
+                        </div>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+    }
+
+    function downloadCSV() {
+        if (newCardsData.length === 0) {
+            alert('No data available to download');
+            return;
+        }
+
+        // Show progress
+        const progressDiv = document.getElementById('downloadProgress');
+        progressDiv.style.display = 'block';
+
+        // Prepare CSV data
+        const headers = ['#', 'Name', 'Phone', 'Account Number', 'Card Number', 'Request Type', 'Date', 'Status', 'Photo'];
+        const csvContent = [
+            headers.join(','),
+            ...newCardsData.map((card, index) => [
+                index + 1,
+                `"${card.name}"`,
+                card.phone,
+                card.account_number,
+                card.card_number,
+                `"${card.request_type}"`,
+                card.date,
+                card.status,
+                card.photo
+            ].join(','))
+        ].join('\n');
+
+        // Create and download file
+        setTimeout(() => {
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', `atm_cards_report_${new Date().toISOString().split('T')[0]}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            // Hide progress
+            progressDiv.style.display = 'none';
+            
+            alert('CSV report downloaded successfully!');
+        }, 1000);
+    }
+
+    // Initialize download button state
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize cards data from existing table
+        initializeCardsData();
+        
+        // Enable download button if there are cards
+        const hasCards = newCardsData.length > 0;
+        document.getElementById('downloadCSVBtn').disabled = !hasCards;
+    });
+</script>
+</body>
+</html>

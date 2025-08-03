@@ -175,13 +175,13 @@
                                         </a>
                                         <ul class="sub-menu" style="display: block;">
                                             <li class="sub-menu-item">
-                                                <a href="index.html" class="">
-                                                    <div class="text">Home 01</div>
+                                                <a href="{% url 'add_atm_card' %}" class="">
+                                                    <div class="text">Add New ATM Card</div>
                                                 </a>
                                             </li>
                                             <li class="sub-menu-item">
                                                 <a href="home-2.html" class="active">
-                                                    <div class="text">Home 02</div>
+                                                    <div class="text">ATM Card Uptake</div>
                                                 </a>
                                             </li>
                                             <li class="sub-menu-item">
@@ -498,7 +498,7 @@
                         <div class="wrap">
                             <div class="header-left">
                                 <a href="index.html">
-                                    <img class="" id="logo_header_mobile" alt="" src="images/logo/logo.png" data-light="images/logo/logo.png" data-dark="images/logo/logo-dark.png" data-width="154px" data-height="52px" data-retina="images/logo/logo@2x.png">
+                                    <img class="" id="logo_header_mobile" alt="CoopLogo" src="{% static 'images/CoopLogo.png' %}" data-light="{% static 'images/CoopLogo.png' %}" data-dark="{% static 'images/CoopLogo.png' %}" style="max-width:154px; height:auto; display:block;">
                                 </a>
                                 <div class="button-show-hide">
                                     <i class="icon-menu-left"></i>
